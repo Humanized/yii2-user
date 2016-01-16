@@ -39,7 +39,7 @@ class Module extends \yii\base\Module {
     {
         parent::init();
         if (\Yii::$app instanceof \yii\console\Application) {
-            $this->controllerNamespace = 'common\modules\user\commands';
+            $this->controllerNamespace = 'humanized\user\commands';
         }
     }
 
