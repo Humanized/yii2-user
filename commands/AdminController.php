@@ -3,8 +3,8 @@
 namespace humanized\user\commands;
 
 use humanized\clihelpers\controllers\Controller;
-use common\modules\user\models\User;
-use common\modules\user\models\PasswordReset;
+use humanized\user\models\User;
+use humanized\user\models\PasswordReset;
 use yii\helpers\Console;
 
 /**
