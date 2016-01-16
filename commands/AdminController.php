@@ -3,7 +3,6 @@
 namespace humanized\user\commands;
 
 use humanized\clihelpers\controllers\Controller;
-use humanized\user\models\User;
 use humanized\user\models\PasswordReset;
 use yii\helpers\Console;
 
@@ -33,11 +32,20 @@ class AdminController extends Controller {
 
     private $_model;
     private $_userClass;
+    private $_findUser;
 
     public function __construct($id, $module, $config = array())
     {
         parent::__construct($id, $module, $config);
-        $this->_userClass = \Yii::$app->user->identityClass;
+        $this->_userClass = $module->params['identityClass'];
+        $this->_findUser = $module->params['fnUser'];
+    }
+
+    private function findModel($user)
+    {
+        $userClass = $this->_userClass;
+        $fn = $this->_findUser;
+        return $userClass::$fn($user);
     }
 
     public function actionIndex()
@@ -47,22 +55,30 @@ class AdminController extends Controller {
         return 0;
     }
 
-    public function actionDelete($email)
+    /**
+     * Deletes a user account from the system.
+     * 
+     * @param string $user
+     * @return int Status-Code
+     */
+    public function actionDelete($user)
     {
-        $deleteCounter = User::deleteAll(['email' => $email]);
-        if (1 === $deleteCounter) {
-            $this->_msg("User Account linked to $email Successfully Deleted");
-        } else {
-            //Error Handling
-            if ($deleteCounter === 0) {
-                $this->_exitCode = 1;
-                $this->_msg("User Account linked to $email Not Found");
-            } else {
-                $this->_msg("Multiple Accounts Deleted - DB may be in Inconsistent State");
+        $model = $this->findModel($user);
+        if (isset($model)) {
+            try {
+                if ($model->delete()) {
+                    $this->_msg = "User Account linked to $user Successfully Deleted";
+                }
+            } catch (\Exception $e) {
                 $this->_exitCode = 200;
+                $this->_msg = $e->getMessage();
             }
+        } else {
+            $this->_exitCode = 100;
+            $this->_msg = "User Account linked to $user Not Found";
         }
-        $this->msgStatus();
+
+        $this->exitMsg();
         return $this->_exitCode;
     }
 
@@ -82,7 +98,7 @@ class AdminController extends Controller {
         if ($model->validate() && $model->sendEmail()) {
             $this->_msg = 'Password reset link successfully sent to ' . $email;
         } else {
-            $this->_exitCode = "400";
+            $this->_exitCode = 400;
             $this->_msg = 'Password reset link could not be sent to ' . $email;
         }
     }
@@ -90,10 +106,14 @@ class AdminController extends Controller {
     /**
      * Add a user account to the system.
      * 
-     * Upon submitting a valid username/email combination, a prompt is launched to get the password corresponding to the user-account. If no password is provided, the system will email the created. 
+     * Upon submitting a valid username/email combination, a prompt is launched to set account password. 
+     * If no password is provided, the system will generate a strong password automatically and send a mail to the user account email
+     * requiring a password reset in order to activate the account. 
      * 
      * This implementation considers the email address as mandatory and the username as optional.
      * If no user-name is provided, the username will be set to the email adress enforcing uniquess on both.
+     * 
+     * 
      * 
      * @todo Optional full exception output
      * @todo Validate e-mail format
@@ -102,7 +122,7 @@ class AdminController extends Controller {
      * @param type $user  Unique username to be assigned to the user account (optional) - If no username is provided, the email address is used.
      * @return int 0 for success, 1 for save error
      */
-    public function actionAdd($email, $user = NULL)
+    public function actionCreate($email, $user = NULL)
     {
         //Creates User model and sets provided variables
         $this->setupModel($email, $user);
@@ -111,13 +131,13 @@ class AdminController extends Controller {
         //Save the model
         try {
             if (!$this->_model->save()) {
-                $this->_exitCode = 10;
+                $this->_exitCode = 100;
                 $this->_msg = 'Unable to save to Database - Validator Failed';
             } elseif ($sendPasswordResetMail) {
                 $this->actionSendPasswordResetLink($this->_model->email);
             }
         } catch (\Exception $e) {
-            $this->_exitCode = 20;
+            $this->_exitCode = 200;
             $this->_msg = $e->getMessage();
         }
         //Should remove in stable versions, but nice little fallback just in case

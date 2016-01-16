@@ -9,7 +9,28 @@ class AdminController extends Controller {
     public function actionIndex()
     {
 
-        $this->render(['index']);
+
+        return $this->render('index');
+    }
+
+    public function actionCreate()
+    {
+        
+    }
+
+    public function actionUpdate($id)
+    {
+        
+    }
+
+    public function actionView($id)
+    {
+        
+    }
+
+    public function actionDelete($id)
+    {
+        
     }
 
 }
