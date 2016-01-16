@@ -130,7 +130,7 @@ class AdminController extends Controller {
         $this->showInput();
         //Two newlines B4 program exit
         $this->exitMsg();
-        return $this->exitCode;
+        return $this->_exitCode;
     }
 
     /**
