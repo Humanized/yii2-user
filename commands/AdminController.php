@@ -109,8 +109,6 @@ class AdminController extends Controller {
      */
     public function actionAdd($email, $user = NULL)
     {
-        $this->stdout("Adding Account for $email");
-        $exitCode = 0;
         //Creates User model and sets provided variables
         $this->setupModel($email, $user);
         //Prompt for account password
@@ -133,7 +131,7 @@ class AdminController extends Controller {
             $exitCode = 1;
         }
         //Should remove in stable versions, but nice little fallback just in case
-        $this->unhideUserInput();
+        $this->showInput();
         //Two newlines B4 program exit
         $this->stdout("\n\n");
         return $exitCode;
@@ -159,7 +157,7 @@ class AdminController extends Controller {
     private function promptPassword()
     {
         $exitCode = FALSE;
-        $this->hideUserInput();
+        $this->hideInput();
         $passwd = $this->_promptPassword();
         $this->stdout("OK", Console::FG_GREEN, Console::BOLD);
         $confirm = "";
@@ -168,7 +166,7 @@ class AdminController extends Controller {
         }
         //Restart when passwords do not match OR rejected confirmation
         //Should remove in stable versions, but nice little fallback just in case
-        $this->unhideUserInput();
+        $this->showInput();
         if (($passwd !== $confirm) || ($passwd === "" && !$this->confirm("\nGenerate Password Automatically?"))) {
             return $this->promptPassword();
         }
@@ -193,28 +191,6 @@ class AdminController extends Controller {
             $passwd = $this->prompt("\n" . ($confirm ? "Confirm" : "Submit") . " User Account Password: ");
         }
         return $passwd;
-    }
-
-    /**
-     * @todo Move to a CLI Helper Class
-     * @todo Make compatible with Windows (stty alternative)
-     */
-    private function hideUserInput()
-    {
-        if (!\yii\helpers\Console::isRunningOnWindows()) {
-            system('stty -echo');
-        }
-    }
-
-    /**
-     * @todo Move to a CLI Helper Class
-     * @todo Make compatible with Windows (stty alternative)
-     */
-    private function unhideUserInput()
-    {
-        if (!\yii\helpers\Console::isRunningOnWindows()) {
-            system('stty echo');
-        }
     }
 
 }
