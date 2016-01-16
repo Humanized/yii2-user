@@ -49,27 +49,21 @@ class AdminController extends Controller {
 
     public function actionDelete($email)
     {
-        $exitCode = 0;
-        $this->stdout("Deleting $email: ");
         $deleteCounter = User::deleteAll(['email' => $email]);
         if (1 === $deleteCounter) {
-            $this->msgSuccess();
+            $this->_msg("User Account linked to $email Successfully Deleted");
         } else {
-
-
             //Error Handling
-
             if ($deleteCounter === 0) {
-                $exitCode = 1;
-                $this->msgError("Account Not Found");
+                $this->_exitCode = 1;
+                $this->_msg("User Account linked to $email Not Found");
             } else {
-                $this->msgError("Multiple Accounts Deleted - DB may be in Inconsistent State");
-                $this->stderr("Multiple Accounts Deleted - DB may be in Inconsistent State", Console::BG_BLUE);
-                $exitCode = 2;
+                $this->_msg("Multiple Accounts Deleted - DB may be in Inconsistent State");
+                $this->_exitCode = 200;
             }
         }
-        $this->stdout("\n");
-        return $exitCode;
+        $this->msgStatus();
+        return $this->_exitCode;
     }
 
     public function actionSendPasswordResetLink($email)
