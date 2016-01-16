@@ -22,7 +22,7 @@ class PasswordReset extends Model {
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'exist',
-                'targetClass' => '\common\modules\user\models\User',
+                'targetClass' => '\humanized\user\models\User',
                 'filter' => ['status' => User::STATUS_ACTIVE],
                 'message' => 'There is no user with such email.'
             ],
