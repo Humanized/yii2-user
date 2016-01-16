@@ -74,7 +74,6 @@ class AdminController extends Controller {
 
     public function actionSendPasswordResetLink($email)
     {
-        $this->stdout("\nSending Password Reset Link to User: ");
         $this->sendMail($email);
     }
 
@@ -87,11 +86,10 @@ class AdminController extends Controller {
     {
         $model = new PasswordReset(['email' => $email]);
         if ($model->validate() && $model->sendEmail()) {
-            $this->stdout("OK", Console::FG_GREEN, Console::BOLD);
+            $this->_msg = 'Password reset link successfully sent to ' . $email;
         } else {
-            $this->stdout("FAILED", Console::FG_RED, Console::BOLD);
-            $this->stderr("\nGenerated Message: ");
-            $this->stderr('System Unable to reset password for the email provided', Console::BG_BLUE);
+            $this->_exitCode = "400";
+            $this->_msg = 'Password reset link could not be sent to ' . $email;
         }
     }
 
@@ -99,6 +97,9 @@ class AdminController extends Controller {
      * Add a user account to the system.
      * 
      * Upon submitting a valid username/email combination, a prompt is launched to get the password corresponding to the user-account. If no password is provided, the system will email the created. 
+     * 
+     * This implementation considers the email address as mandatory and the username as optional.
+     * If no user-name is provided, the username will be set to the email adress enforcing uniquess on both.
      * 
      * @todo Optional full exception output
      * @todo Validate e-mail format
@@ -116,25 +117,20 @@ class AdminController extends Controller {
         //Save the model
         try {
             if (!$this->_model->save()) {
-                $this->stdout("FAILED", Console::FG_RED, Console::BOLD);
-                $this->stderr("\nGenerated Message: ");
-                //Todo: Optional full error message display
-                $this->stderr('Unable to save to Database - Validator Failed', Console::BG_BLUE);
+                $this->_exitCode = 10;
+                $this->_msg = 'Unable to save to Database - Validator Failed';
             } elseif ($sendPasswordResetMail) {
                 $this->actionSendPasswordResetLink($this->_model->email);
             }
         } catch (\Exception $e) {
-            $this->stdout("FAILED", Console::FG_RED);
-            $this->stderr("\nGenerated Message: ");
-            //Todo: Optional full error message display
-            $this->stderr(strtok($e->getMessage(), "\n"), Console::BG_BLUE);
-            $exitCode = 1;
+            $this->_exitCode = 20;
+            $this->_msg = $e->getMessage();
         }
         //Should remove in stable versions, but nice little fallback just in case
         $this->showInput();
         //Two newlines B4 program exit
-        $this->stdout("\n\n");
-        return $exitCode;
+        $this->exitMsg();
+        return $this->exitCode;
     }
 
     /**
@@ -156,7 +152,6 @@ class AdminController extends Controller {
 
     private function promptPassword()
     {
-        $exitCode = FALSE;
         $this->hideInput();
         $passwd = $this->_promptPassword();
         $this->stdout("OK", Console::FG_GREEN, Console::BOLD);
