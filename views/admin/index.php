@@ -1,8 +1,13 @@
-<?php
+<div class="row">
+    <aside class="col-md-2 well">
+        <blockquote><span class="glyphicon glyphicon-user"></span> User Administration</blockquote>
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+        <?= $this->render("_aside") ?>
+    </aside>
+    <div class="col-md-6">
+        Grid
+    </div>
+    <div class="col-md-4">
+        Search        
+    </div>
+</div>
