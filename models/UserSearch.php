@@ -1,11 +1,11 @@
 <?php
 
 class UserSearch extends yii\db\ActiveRecord {
-    
-    //Search Filter Operations
-    
-  
-    
+
+    //Search Filter Parameters
+    public $userFilter = [];
+    public $statusFilter = [];
+
     /**
      * @inheritdoc
      */
@@ -13,11 +13,10 @@ class UserSearch extends yii\db\ActiveRecord {
     {
         return '{{%user}}';
     }
-    
-    public function search($params){
+
+    public function search($params)
+    {
         
     }
-    
-   
 
 }

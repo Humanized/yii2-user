@@ -6,6 +6,13 @@ use yii\helpers\ArrayHelper;
 
 class GUIHelper {
 
+    private $_module = NULL;
+
+    public function __construct()
+    {
+        $this->$_module = \Yii::$app->controller->module;
+    }
+
     public static function getMenuItems()
     {
         $output = [];
@@ -19,15 +26,10 @@ class GUIHelper {
 
     public static function getStatusList()
     {
-        $module = \Yii::$app->controller->module;
-        if ($module->params['enableStatusCodes']) {
-            
+        if ($this->_module->params['enableStatusCodes']) {
+            return $this->_module->statusCodes;
         }
-    }
-
-    public static function getStatusListFromDB()
-    {
-        
+        return NULL;
     }
 
 }
