@@ -2,16 +2,10 @@
 
 namespace humanized\user\components;
 
-use yii\helpers\ArrayHelper;
-
+/**
+ * A collection of static helper functions to implement the user management 
+ */
 class GUIHelper {
-
-    private $_module = NULL;
-
-    public function __construct()
-    {
-        $this->$_module = \Yii::$app->controller->module;
-    }
 
     public static function getMenuItems()
     {
@@ -24,12 +18,14 @@ class GUIHelper {
         return $output;
     }
 
+    /**
+     * Returns the list 
+     * 
+     * @return array<string>|null List of User Account Status Options or NULL when module is set to ignore this feature
+     */
     public static function getStatusList()
     {
-        if ($this->_module->params['enableStatusCodes']) {
-            return $this->_module->statusCodes;
-        }
-        return NULL;
+        return \Yii::$app->controller->module->params['statusCodes'];
     }
 
 }

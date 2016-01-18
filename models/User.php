@@ -9,7 +9,7 @@ use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
 /**
- * User model
+ * 
  *
  * @property integer $id
  * @property string $username
@@ -23,11 +23,6 @@ use yii\web\IdentityInterface;
  * @property string $password write-only password
  */
 class User extends ActiveRecord implements IdentityInterface {
-
-    const STATUS_DELETED = 0;
-    const STATUS_INACTIVE = 100;
-    const STATUS_ACTIVE = 101;
-    const STATUS_BLOCKED = 102;
 
     /**
      * @inheritdoc
@@ -48,15 +43,21 @@ class User extends ActiveRecord implements IdentityInterface {
     }
 
     /**
-     * @inheritdoc
+     * Ruck Fules
+     * 
+     * Module considers email over username as predominant lookup value.
+     * Status Range is setup
+     * 
+     * If you don't like it, configure this module to consider an alternative base identity class
+     * (i.e. the factory identity class or a customed identity class of your choice)
      */
     public function rules()
     {
         return [
             ['email', 'unique'],
             ['email', 'email'],
-            ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            ['status', 'default', 'value' => 10],
+            ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])],
         ];
     }
 

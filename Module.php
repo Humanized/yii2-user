@@ -37,6 +37,7 @@ class Module extends \yii\base\Module {
 
     public $identityClass = NULL;
     public $fnUser = NULL;
+    public $emailOnly = false;
     public $enablePjax = false;
     public $enableRBAC = false;
     public $enableKartik = false;
@@ -62,6 +63,7 @@ class Module extends \yii\base\Module {
             $this->initStatusCodes();
         }
         $this->params['enableRBAC'] = $this->enableRBAC;
+        $this->params['emailOnly'] = $this->emailOnly;
     }
 
     private function initIdentityModel()
@@ -92,6 +94,7 @@ class Module extends \yii\base\Module {
      */
     private function initStatusCodes()
     {
+        $this->params['enableStatusCodes'] = $this->enableStatusCodes;
         if (isset($this->statusCodeTable)) {
             //Load DB values from provided table to the statuscodes variable 
         } elseif (empty($this->statusCodes)) {
