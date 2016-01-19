@@ -2,18 +2,39 @@
 
 namespace humanized\user\components;
 
+use yii\helpers\Html;
+
 /**
  * A collection of static helper functions to implement the user management 
  */
 class GUIHelper {
+
+    public static function getUserMenuItems()
+    {
+        $menuItems = [];
+        if (\Yii::$app->user->isGuest) {
+            
+            $menuItems[] = ['label' => 'Signup', 'url' => ['user/account/signup']];
+            $menuItems[] = ['label' => 'Login', 'url' => ['/user/account/login']];
+        } else {
+            $menuItems[] = '<li>'
+                    . Html::beginForm(['/site/logout'], 'post')
+                    . Html::submitButton(
+                            'Logout (' . \Yii::$app->user->identity->email . ')', ['class' => 'btn btn-link']
+                    )
+                    . Html::endForm()
+                    . '</li>';
+        }
+        return $menuItems;
+    }
 
     public static function getMenuItems()
     {
         $output = [];
         $output[] = ['label' => 'User Management', 'url' => ['/user/admin/index']];
         //     if (NULL !== \Yii::$app->user->getId()) {
-        $output[] = ['label' => 'My Profile', 'url' => ['/user/profile', 'id' => \Yii::$app->user->getId()]];
-        $output[] = ['label' => 'Account Settings', 'url' => ['/user/admin/settings', 'id' => \Yii::$app->user->getId()]];
+        $output[] = ['label' => 'My Profile', 'url' => ['/user/account', 'id' => \Yii::$app->user->getId()]];
+        //$output[] = ['label' => 'Account Settings', 'url' => ['/user/admin/settings', 'id' => \Yii::$app->user->getId()]];
         //$output[] = ['label' => 'Generate Token', 'url' => ['/user/admin/request-token', 'id' => \Yii::$app->user->getId()]];
         //     }
         return $output;

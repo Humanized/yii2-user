@@ -15,11 +15,14 @@ Essentially, this module can functionally achieve the same as provided by the ad
 
 ## Installation
 
-## Update
+### Install Using Composer
 
-## Usage
+### Add Module to Configuration
 
-### Module Configuration Options
+### Run Migrations 
+
+
+## Module Configuration Options
 
 
 

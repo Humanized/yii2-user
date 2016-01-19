@@ -38,6 +38,7 @@ class Module extends \yii\base\Module {
     public $identityClass = NULL;
     public $fnUser = NULL;
     public $emailOnly = false;
+    public $enableSignUp = true;
     public $enablePasswords = true;
     public $enablePjax = false;
     public $enableRBAC = false;
@@ -66,6 +67,7 @@ class Module extends \yii\base\Module {
         $this->params['enableRBAC'] = $this->enableRBAC;
         $this->params['emailOnly'] = $this->emailOnly;
         $this->params['enablePasswords'] = $this->enablePasswords;
+        $this->params['enableSignUp'] = $this->enablePasswords;
     }
 
     private function initIdentityModel()
