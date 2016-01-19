@@ -5,9 +5,10 @@
 > GNU/Linux Support Only (for the moment) 
 
 
-## Version 0.1 :
+## Version 0.1
 * Incorporated functionality provided by the Yii2 advanced-application template
 * Email login and disabled username by default
+* Intuitive yet advanced handling of user status options
 * Modular User Management Dashboard
 * API Token Generation 
 * User Account Creation (Using GUI or CLI)
