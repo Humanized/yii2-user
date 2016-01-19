@@ -1,4 +1,4 @@
-# yii2-user - README
+# Yii2-User - README
 [![Yii2](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=flat)](http://www.yiiframework.com/)
 Provides various interfaces to deal with routine user management tasks.
 
@@ -24,6 +24,8 @@ Essentially, this module can functionally achieve the same as provided by the ad
 
 ## Module Configuration Options
 
+### Global Configuration Options
 
+### Grid Configuration Options
 
 ### RBAC Integration
