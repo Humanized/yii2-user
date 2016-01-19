@@ -5,7 +5,8 @@ Provides various interfaces to deal with routine user management tasks.
 
 > This extension is under heavy development and requires the use of Yii framework version 2.0.7
 > This version of the framework is currently in-active development  
-> Use of this module should be considered highly unstable until further notice 
+
+> This module should be considered highly unstable and it's use is discouraged until further notice (really)
 
 ## Features
 
@@ -26,6 +27,8 @@ Essentially, this module can functionally achieve the same as provided by the ad
 ## Module Configuration Options
 
 ### Global Configuration Options
+
+
 
 ### Grid Configuration Options
 
