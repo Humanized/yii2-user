@@ -14,7 +14,8 @@ class UserSearch extends User {
     {
         $unfiltered = !($this->load($params) && $this->validate());
         $query = new \yii\db\Query;
-        $query->from=['{{%user}}'];
+       
+        $query->from = ['{{%user}}'];
 
 
         return new ActiveDataProvider([

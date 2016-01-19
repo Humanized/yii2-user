@@ -44,7 +44,11 @@ class AdminController extends Controller {
 
     public function actionDelete($id)
     {
-        
+        $user = User::findOne(['id' => $id]);
+        if (isset($user)) {
+            $user->delete();
+        }
+        return $this->redirect(['index']);
     }
 
 }
