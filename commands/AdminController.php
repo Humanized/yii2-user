@@ -69,6 +69,7 @@ class AdminController extends Controller {
                 if ($model->delete()) {
                     $this->_msg = "User Account linked to $user Successfully Deleted";
                 }
+                $this->_msg = "Unable to Delete User Account linked to $user";
             } catch (\Exception $e) {
                 $this->_exitCode = 200;
                 $this->_msg = $e->getMessage();
@@ -147,6 +148,7 @@ class AdminController extends Controller {
         return $this->_exitCode;
     }
 
+
     /**
      * Initialises User model, by setting email and username combination
      * along with generating an random authentication key
@@ -173,18 +175,17 @@ class AdminController extends Controller {
         if ($passwd !== "") {
             $confirm = $this->_promptPassword(TRUE);
         }
-        //Restart when passwords do not match OR rejected confirmation
-        //Should remove in stable versions, but nice little fallback just in case
+
         $this->showInput();
+        //Restart when passwords do not match OR rejected confirmation
         if (($passwd !== $confirm) || ($passwd === "" && !$this->confirm("\nGenerate Password Automatically?"))) {
             return $this->promptPassword();
         }
+        //Autogenerate password
         if ($passwd === "") {
             $passwd = \Yii::$app->security->generateRandomString();
-            $exitCode = TRUE;
         }
-        $this->_model->password = $passwd;
-        return $exitCode;
+        $this->_model->setPassword($passwd);
     }
 
     /**

@@ -25,6 +25,24 @@ use yii\web\IdentityInterface;
 class User extends ActiveRecord implements IdentityInterface {
 
     /**
+     *
+     * @var boolean 
+     */
+    public $generatePassword = true;
+
+    /**
+     *
+     * @var string 
+     */
+    public $password;
+
+    /**
+     * Only required in GUI version of the program
+     * @var string 
+     */
+    public $password_confirm;
+
+    /**
      * @inheritdoc
      */
     public static function tableName()
@@ -43,22 +61,37 @@ class User extends ActiveRecord implements IdentityInterface {
     }
 
     /**
-     * Ruck Fules
-     * 
      * Module considers email over username as predominant lookup value.
-     * Status Range is setup
+     * Status Range is setup to configuration settings
      * 
-     * If you don't like it, configure this module to consider an alternative base identity class
-     * (i.e. the factory identity class or a customed identity class of your choice)
      */
     public function rules()
     {
-        return [
+        $rules = [
             ['email', 'unique'],
             ['email', 'email'],
-            ['status', 'default', 'value' => 10],
-            ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])],
         ];
+
+        if (\Yii::$app->controller->module->params['enablePasswords']) {
+            $rules = array_merge($rules, [
+                ['password', 'required'],
+                ['password', 'string', 'min' => 8],
+                ['password_confirm', 'required', 'when' => function($model) {
+                        return !$model->generatePassword;
+                    }],
+                ['password_confirm', 'compare', 'compareAttribute' => 'password', 'message' => "Passwords don't match"],
+            ]);
+        }
+        if (\Yii::$app->controller->module->params['enableStatusCodes']) {
+            $rules = array_merge($rules, [
+                ['status', 'default', 'value' => 10],
+                ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])]
+            ]);
+        }
+        if (!\Yii::$app->controller->module->params['emailOnly']) {
+            $rules = array_merge($rules, [['username', 'unique']]);
+        }
+        return $rules;
     }
 
     /**
@@ -85,7 +118,7 @@ class User extends ActiveRecord implements IdentityInterface {
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+        return static::findOne(['username' => $username]);
     }
 
     /**
@@ -190,6 +223,23 @@ class User extends ActiveRecord implements IdentityInterface {
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    public function beforeSave($insert)
+    {
+
+        if ($insert) {
+            $this->generateAuthKey();
+            $this->setPassword($this->password);
+        }
+        return parent::beforeSave($insert);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert && $this->generatePassword) {
+            
+        }
     }
 
 }

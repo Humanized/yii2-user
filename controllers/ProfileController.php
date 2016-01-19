@@ -10,18 +10,12 @@ class AdminController extends Controller {
 
     public function actionIndex()
     {
-        $model = new User();
-        $model->generateAuthKey();
-        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            $model = new User(); //reset model
-        }
-
+        
         $searchModel = new UserSearch();
         $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
 
 
         return $this->render('index', [
-                    'model' => $model,
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider
         ]);

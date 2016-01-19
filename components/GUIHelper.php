@@ -11,10 +11,11 @@ class GUIHelper {
     {
         $output = [];
         $output[] = ['label' => 'User Management', 'url' => ['/user/admin/index']];
-        if (NULL !== \Yii::$app->user->getId()) {
-            $output[] = ['label' => 'Account', 'url' => ['/user/admin/account', 'id' => \Yii::$app->user->getId()]];
-            // $output[] = ['label' => '', 'url' => ['/user/admin/account', 'id' => \Yii::$app->user->getId()]];
-        }
+        //     if (NULL !== \Yii::$app->user->getId()) {
+        $output[] = ['label' => 'My Profile', 'url' => ['/user/profile', 'id' => \Yii::$app->user->getId()]];
+        $output[] = ['label' => 'Account Settings', 'url' => ['/user/admin/settings', 'id' => \Yii::$app->user->getId()]];
+        //$output[] = ['label' => 'Generate Token', 'url' => ['/user/admin/request-token', 'id' => \Yii::$app->user->getId()]];
+        //     }
         return $output;
     }
 

@@ -6,8 +6,11 @@
  * and open the template in the editor.
  */
 
-$columns = array_merge(
-        (\Yii::$app->controller->module->params['emailOnly'] ? [] : ['username'])
+$columns = array_merge([[
+'class' => yii\grid\ActionColumn::className(),
+ 'template' => '{view} {delete}',
+// you may configure additional properties here
+    ]], (\Yii::$app->controller->module->params['emailOnly'] ? [] : ['username'])
         , ['email:email', 'created_at:datetime']);
 
 $config = [

@@ -23,7 +23,7 @@ class PasswordReset extends Model {
             ['email', 'email'],
             ['email', 'exist',
                 'targetClass' => '\humanized\user\models\User',
-                'filter' => ['status' => User::STATUS_ACTIVE],
+          //      'filter' => ['status' => User::STATUS_ACTIVE],
                 'message' => 'There is no user with such email.'
             ],
         ];
@@ -39,7 +39,7 @@ class PasswordReset extends Model {
 
         /* @var $user User */
         $user = User::findOne([
-                    'status' => User::STATUS_ACTIVE,
+                  //  'status' => User::STATUS_ACTIVE,
                     'email' => $this->email,
         ]);
 
