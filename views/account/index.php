@@ -8,12 +8,15 @@
     </aside>
 
     <div class="col-md-8">
-        <h2>User Management</h2>
         <?=
-        $this->render('_grid', [
-            'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel
-        ])
+        DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'email:email', // title attribute (in plain text)
+                'created_at:datetime', // creation date formatted as datetime
+                'updated_at:datetime', // creation date formatted as datetime
+            ],
+        ]);
         ?>
     </div>
     <div class="col-md-2">

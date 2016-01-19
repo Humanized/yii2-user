@@ -13,7 +13,7 @@ $columns = array_merge([[
             'data-pjax' => '0']
         ;
 
-        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['/user/profile/view', 'id' => $model['id']], $options);
+        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['/user/account/index', 'id' => $model['id']], $options);
     },
             'delete' => function ($url, $model, $key) {
         $options = [
