@@ -28,4 +28,24 @@ Essentially, this module can functionally achieve the same as provided by the ad
 
 ### Grid Configuration Options
 
+### CLI Configuration Options
+
 ### RBAC Integration
+
+## Graphical User Interface (GUI)
+
+
+
+## Command Line Interface (CLI)
+
+Following commands are supported:
+
+> php yii user/admin/create <email:required> <username:optional>
+
+> php yii user/admin/delete <email:required>
+
+The module provides
+
+## REST Interface (API)
+
+Under construction
