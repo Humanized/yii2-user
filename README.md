@@ -4,7 +4,8 @@
 Provides various interfaces to deal with routine user management tasks.
 
 > This extension is under heavy development and requires the use of Yii framework version 2.0.7
-> This version of the framework is currently in-active development   
+> This version of the framework is currently in-active development  
+> Use of this module should be considered highly unstable until further notice 
 
 ## Features
 
@@ -53,4 +54,4 @@ The module provides
 
 ## REST Interface (API)
 
-Under construction
+Due before version 0.5
