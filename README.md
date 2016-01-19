@@ -34,6 +34,11 @@ Essentially, this module can functionally achieve the same as provided by the ad
 
 ## Graphical User Interface (GUI)
 
+Following actions are supported:
+
+> user/admin/index: User Administration Dashboard
+
+> user/account/index?id=<integer>: User Account Page
 
 
 ## Command Line Interface (CLI)
