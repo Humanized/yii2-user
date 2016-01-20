@@ -11,11 +11,10 @@ class GUIHelper {
 
     public static function getUserMenuItems()
     {
+
         $menuItems = [];
         if (\Yii::$app->user->isGuest) {
-            if (\Yii::$app->controller->module->params['enableSignUp']) {
-                $menuItems[] = ['label' => 'Signup', 'url' => ['/user/account/signup']];
-            }
+            $menuItems[] = ['label' => 'Signup', 'visible' => \Yii::$app->getModule('user')->params['enableSignUp'], 'url' => ['/user/account/signup']];
             $menuItems[] = ['label' => 'Login', 'url' => ['/user/account/login']];
         } else {
             $menuItems[] = '<li>'
