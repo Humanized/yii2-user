@@ -11,7 +11,6 @@ class AdminController extends Controller {
     public function actionIndex()
     {
         $model = new User();
-        $model->generateAuthKey();
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             $model = new User(); //reset model
         }

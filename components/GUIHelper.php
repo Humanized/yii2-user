@@ -13,8 +13,9 @@ class GUIHelper {
     {
         $menuItems = [];
         if (\Yii::$app->user->isGuest) {
-            
-            $menuItems[] = ['label' => 'Signup', 'url' => ['user/account/signup']];
+        if (\Yii::$app->controller->module->params['enableSignUp']) {
+            $menuItems[] = ['label' => 'Signup', 'url' => ['/user/account/signup']];
+        }
             $menuItems[] = ['label' => 'Login', 'url' => ['/user/account/login']];
         } else {
             $menuItems[] = '<li>'
@@ -32,8 +33,9 @@ class GUIHelper {
     {
         $output = [];
         $output[] = ['label' => 'User Management', 'url' => ['/user/admin/index']];
-        //     if (NULL !== \Yii::$app->user->getId()) {
-        $output[] = ['label' => 'My Profile', 'url' => ['/user/account', 'id' => \Yii::$app->user->getId()]];
+        if (NULL !== \Yii::$app->user->getId()) {
+            $output[] = ['label' => 'My Profile', 'url' => ['/user/account/index', 'id' => \Yii::$app->user->getId()]];
+        }
         //$output[] = ['label' => 'Account Settings', 'url' => ['/user/admin/settings', 'id' => \Yii::$app->user->getId()]];
         //$output[] = ['label' => 'Generate Token', 'url' => ['/user/admin/request-token', 'id' => \Yii::$app->user->getId()]];
         //     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace humanized\user\models;
+namespace humanized\user\models\gui;
 
 use Yii;
 use yii\base\Model;

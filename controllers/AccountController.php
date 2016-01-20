@@ -3,7 +3,8 @@
 namespace humanized\user\controllers;
 
 use yii\web\Controller;
-use humanized\user\models\LoginForm;
+use humanized\user\models\gui\LoginForm;
+use humanized\user\models\gui\SignupForm;
 use humanized\user\models\User;
 use humanized\user\models\UserSearch;
 
@@ -42,16 +43,37 @@ class AccountController extends Controller {
         return $this->goHome();
     }
 
-    public function actionIndex()
+    /**
+     * Signs user up.
+     *
+     * @return mixed
+     */
+    public function actionSignup()
     {
+        if (!\Yii::$app->controller->module->params['enableSignUp']) {
+            throw new \yii\web\NotFoundHttpException('Page not found.');
+        }
+        $model = new SignupForm();
+        if ($model->load(\Yii::$app->request->post())) {
+            if ($user = $model->signup()) {
+                if (\Yii::$app->getUser()->login($user)) {
+                    return $this->goHome();
+                }
+            }
+        }
 
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
+        return $this->render('signup', [
+                    'model' => $model,
+        ]);
+    }
+
+    public function actionIndex($id)
+    {
+        $model = User::findOne(['id' => $id]);
 
 
         return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider
+                    'model' => $model,
         ]);
     }
 

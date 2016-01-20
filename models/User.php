@@ -28,7 +28,7 @@ class User extends ActiveRecord implements IdentityInterface {
      *
      * @var boolean 
      */
-    public $generatePassword = true;
+    public $generatePassword = false;
 
     /**
      *
@@ -68,7 +68,7 @@ class User extends ActiveRecord implements IdentityInterface {
     public function rules()
     {
         $rules = [
-    
+
             ['email', 'unique'],
             ['email', 'email'],
         ];
@@ -77,6 +77,9 @@ class User extends ActiveRecord implements IdentityInterface {
             $rules = array_merge($rules, [
                 ['password', 'required'],
                 ['password', 'string', 'min' => 8],
+                ['password', 'required', 'when' => function($model) {
+                        return !$model->generatePassword;
+                    }],
                 ['password_confirm', 'required', 'when' => function($model) {
                         return !$model->generatePassword;
                     }],
@@ -226,20 +229,27 @@ class User extends ActiveRecord implements IdentityInterface {
         $this->password_reset_token = null;
     }
 
-    public function beforeSave($insert)
+    public function beforeValidate()
     {
-
-        if ($insert) {
-            $this->generateAuthKey();
-            $this->setPassword($this->password);
+        $this->generateAuthKey();
+        $passwd = $this->password;
+        if ($this->generatePassword) {
+            $passwd = \Yii::$app->security->generateRandomString();
         }
-        return parent::beforeSave($insert);
+        $this->setPassword($passwd);
+
+        return parent::beforeValidate();
     }
 
     public function afterSave($insert, $changedAttributes)
     {
         if ($insert && $this->generatePassword) {
-            
+            $model = new PasswordReset(['email' => $this->email]);
+            if ($model->validate() && $model->sendEmail()) {
+                return parent::afterSave($insert, $changedAttributes);
+            } else {
+                return false;
+            }
         }
     }
 
