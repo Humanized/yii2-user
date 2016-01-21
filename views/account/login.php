@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-lg-5">
             <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-            <?= \Yii::$app->controller->module->params['enableUserName'] ? $form->field($model, 'username')->textInput(['autofocus' => true]) : FALSE ?>
+            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
 
             <?= $form->field($model, 'password')->passwordInput() ?>
 
