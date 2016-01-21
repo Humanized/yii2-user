@@ -29,7 +29,7 @@ class SignupForm extends Model {
             ['password', 'string', 'min' => 6],
         ];
 
-        if (!\Yii::$app->controller->module->params['emailOnly']) {
+        if (!\Yii::$app->controller->module->params['enableUserName']) {
             $rules = array_merge($rules, [
                 ['username', 'filter', 'filter' => 'trim'],
                 ['username', 'required'],

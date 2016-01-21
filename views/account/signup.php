@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-lg-5">
             <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
 
-            <?= !\Yii::$app->controller->module->params['emailOnly'] ? $form->field($model, 'username')->textInput(['autofocus' => true]) : FALSE ?>
+            <?= \Yii::$app->getModule('user')->params['enableUserName'] ? $form->field($model, 'username')->textInput(['autofocus' => true]) : FALSE ?>
 
             <?= $form->field($model, 'email') ?>
 

@@ -92,7 +92,7 @@ class User extends ActiveRecord implements IdentityInterface {
                 ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])]
             ]);
         }
-        if (!\Yii::$app->controller->module->params['emailOnly']) {
+        if (\Yii::$app->controller->params['enableUserName']) {
             $rules = array_merge($rules, [['username', 'unique']]);
         }
         return $rules;
