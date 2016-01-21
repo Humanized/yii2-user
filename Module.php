@@ -155,7 +155,10 @@ class Module extends \yii\base\Module {
             $this->initStatusCodes();
         }
         $this->params['enableRBAC'] = $this->enableRBAC;
-        $this->params['emailOnly'] = $this->emailOnly;
+        $this->params['enableTokenAuthentication'] = $this->enableTokenAuthentication;
+        $this->params['enableUserName'] = $this->enableUserName;
+        $this->params['enableAdminVerification']=$this->enableAdminVerification;
+        $this->params['enableUserVerification']=$this->enableUserVerification;
         $this->params['enablePasswords'] = $this->enablePasswords;
         $this->params['enableSignUp'] = $this->enableSignUp;
     }
