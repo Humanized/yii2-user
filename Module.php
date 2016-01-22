@@ -202,6 +202,7 @@ class Module extends \yii\base\Module {
             //Fallback to stock-like functionality
             $this->params['statusCodes'] = [0 => 'INACTIVE', 10 => 'ACTIVE'];
         }
+        $this->params['defaultStatusCode'] = $this->defaultStatusCode;
     }
 
 }
