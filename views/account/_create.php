@@ -17,7 +17,7 @@ if (\Yii::$app->controller->module->params['enableUserName']) {
 }
 echo $form->field($model, 'email')->input('email');
 
-if ($model->scenario != 'signup') {
+if ($model->scenario != \humanized\user\models\common\User::SCENARIO_SIGNUP) {
     if (\Yii::$app->controller->module->params['enableStatusCodes']) {
         echo $form->field($model, 'status')->dropDownList(\humanized\user\components\GUIHelper::getStatusList(), ['prompt' => 'Select Status Value']);
     }
@@ -26,7 +26,7 @@ if ($model->scenario != 'signup') {
         'format' => 'boolean']);
 }
 ?>
-<div id="password-fields">
+<div id="password-fields" style="display:<?= $model->generatePassword ? "none" : "block" ?>">
     <?php
     echo $form->field($model, 'password')->input('password')->hint('Password should be within A-Za-z0-9')->label('Password');
     echo $form->field($model, 'password_confirm')->input('password')->label('Confirm Password')

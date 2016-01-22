@@ -56,6 +56,22 @@ class User extends ActiveRecord implements IdentityInterface {
      * @var string 
      */
     public $password_confirm;
+    private $_module = NULL;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+        $this->_module = \humanized\user\Module::getInstance();
+        if ($this->getScenario() == self::SCENARIO_ADMIN) {
+            $this->generatePassword = TRUE;
+            if ($this->_module->params['enableStatusCodes']) {
+                $this->status = $this->_module->params['defaultStatusCode'];
+            }
+        }
+    }
 
     /**
      * @inheritdoc
