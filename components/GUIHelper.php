@@ -18,7 +18,7 @@ class GUIHelper {
             $menuItems[] = ['label' => 'Login', 'url' => ['/user/account/login']];
         } else {
             $menuItems[] = '<li>'
-                    . Html::beginForm(['/site/logout'], 'post')
+                    . Html::beginForm(['/user/account/logout'], 'post')
                     . Html::submitButton(
                             'Logout (' . \Yii::$app->user->identity->email . ')', ['class' => 'btn btn-link']
                     )
