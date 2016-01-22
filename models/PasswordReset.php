@@ -2,7 +2,7 @@
 
 namespace humanized\user\models;
 
-use humanized\user\models\User;
+use humanized\user\models\common\User;
 use yii\base\Model;
 
 /**
@@ -23,7 +23,7 @@ class PasswordReset extends Model {
             ['email', 'email'],
             ['email', 'exist',
                 'targetClass' => '\humanized\user\models\User',
-          //      'filter' => ['status' => User::STATUS_ACTIVE],
+                //      'filter' => ['status' => User::STATUS_ACTIVE],
                 'message' => 'There is no user with such email.'
             ],
         ];
@@ -39,7 +39,7 @@ class PasswordReset extends Model {
 
         /* @var $user User */
         $user = User::findOne([
-                  //  'status' => User::STATUS_ACTIVE,
+                    //  'status' => User::STATUS_ACTIVE,
                     'email' => $this->email,
         ]);
 
@@ -48,7 +48,7 @@ class PasswordReset extends Model {
             if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
                 $user->generatePasswordResetToken();
             }
-     
+
             if ($user->save()) {
                 return \Yii::$app->mailer->compose(['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'], ['user' => $user])
                                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])

@@ -2,7 +2,7 @@
 
 namespace humanized\user\models\gui;
 
-use humanized\user\models\User;
+use humanized\user\models\common\User;
 use yii\base\Model;
 use Yii;
 

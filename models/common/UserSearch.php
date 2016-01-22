@@ -1,6 +1,6 @@
 <?php
 
-namespace humanized\user\models;
+namespace humanized\user\models\common;
 
 use yii\data\ActiveDataProvider;
 

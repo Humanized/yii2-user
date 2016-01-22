@@ -3,8 +3,8 @@
 namespace humanized\user\controllers;
 
 use yii\web\Controller;
-use humanized\user\models\User;
-use humanized\user\models\UserSearch;
+use humanized\user\models\common\User;
+use humanized\user\models\common\UserSearch;
 
 class AdminController extends Controller {
 
