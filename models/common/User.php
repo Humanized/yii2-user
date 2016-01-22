@@ -61,7 +61,7 @@ class User extends ActiveRecord implements IdentityInterface {
     {
         parent::init();
         if (!isset($this->status)) {
-          //  $this->status = \Yii::$app->controller->module->params['defaultStatusCode'];
+            //  $this->status = \Yii::$app->controller->module->params['defaultStatusCode'];
         }
     }
 
@@ -124,8 +124,8 @@ class User extends ActiveRecord implements IdentityInterface {
             ['password_confirm', 'required',
                 'on' => [self::SCENARIO_SIGNUP, self::SCENARIO_ADMIN],
                 'when' => function($model) {
-                    return !$model->generatePassword;
-                },
+            return !$model->generatePassword;
+        },
                 'whenClient' => "function (attribute, value) {
                                      return $('#generate-password').checked==false;
                                 }"
@@ -293,15 +293,13 @@ class User extends ActiveRecord implements IdentityInterface {
 
     public function afterSave($insert, $changedAttributes)
     {
-        if ($insert && $this->generatePassword) {
-
+        if ($this->generatePassword) {
             $model = new PasswordReset(['email' => $this->email]);
-            if ($model->validate() && $model->sendEmail()) {
-                return parent::afterSave($insert, $changedAttributes);
-            } else {
+            if (!($model->validate() && $model->sendEmail())) {
                 return false;
             }
         }
+        return parent::afterSave($insert, $changedAttributes);
     }
 
 }

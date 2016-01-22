@@ -1,6 +1,6 @@
 <?php
 
-namespace humanized\user\models;
+namespace humanized\user\models\common;
 
 use humanized\user\models\common\User;
 use yii\base\Model;
@@ -22,7 +22,7 @@ class PasswordReset extends Model {
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'exist',
-                'targetClass' => '\humanized\user\models\User',
+                'targetClass' => '\humanized\user\models\common\User',
                 //      'filter' => ['status' => User::STATUS_ACTIVE],
                 'message' => 'There is no user with such email.'
             ],
@@ -45,7 +45,7 @@ class PasswordReset extends Model {
 
 
         if ($user) {
-            $user->setScenario(User::SCENARIO_PWDRST_TOKEN);
+            $user->setScenario(User::SCENARIO_PWDRST);
             if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
                 $user->generatePasswordResetToken();
             }
