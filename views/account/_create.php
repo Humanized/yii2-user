@@ -16,12 +16,15 @@ if (\Yii::$app->controller->module->params['enableUserName']) {
     echo $form->field($model, 'username')->input('username');
 }
 echo $form->field($model, 'email')->input('email');
-if (\Yii::$app->controller->module->params['enableStatusCodes']) {
-    echo $form->field($model, 'status')->dropDownList(\humanized\user\components\GUIHelper::getStatusList(), ['prompt' => 'Select Status Value']);
-}
+
+if (!$model->scenario = 'signup') {
+    if (\Yii::$app->controller->module->params['enableStatusCodes']) {
+        echo $form->field($model, 'status')->dropDownList(\humanized\user\components\GUIHelper::getStatusList(), ['prompt' => 'Select Status Value']);
+    }
 //Optional Password Autogeneration
-echo $form->field($model, 'generatePassword')->checkBox(['attribute' => 'generatePassword',
-    'format' => 'boolean']);
+    echo $form->field($model, 'generatePassword')->checkBox(['attribute' => 'generatePassword',
+        'format' => 'boolean']);
+}
 ?>
 <div id="password-fields">
     <?php

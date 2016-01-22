@@ -71,12 +71,11 @@ class User extends ActiveRecord implements IdentityInterface {
 
             ['email', 'unique'],
             ['email', 'email'],
-            
         ];
 
         if (\Yii::$app->controller->module->params['enablePasswords']) {
             $rules = array_merge($rules, [
-                ['generatePassword','required'],
+                ['generatePassword', 'required'],
                 ['password', 'required'],
                 ['password', 'string', 'min' => 8],
                 ['password', 'required', 'when' => function($model) {
@@ -90,6 +89,7 @@ class User extends ActiveRecord implements IdentityInterface {
         }
         if (\Yii::$app->controller->module->params['enableStatusCodes']) {
             $rules = array_merge($rules, [
+                ['status', 'required'],
                 ['status', 'default', 'value' => \Yii::$app->controller->module->params['defaultStatusCode']],
                 ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])]
             ]);
@@ -98,6 +98,13 @@ class User extends ActiveRecord implements IdentityInterface {
             $rules = array_merge($rules, [['username', 'unique']]);
         }
         return $rules;
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['signup'] = ['email', 'password', 'password_confirm'];
+        return $scenarios;
     }
 
     /**
@@ -231,15 +238,20 @@ class User extends ActiveRecord implements IdentityInterface {
     {
         $this->password_reset_token = null;
     }
+    
 
     public function beforeValidate()
     {
         $this->generateAuthKey();
         $passwd = $this->password;
+        if ($this->scenario == 'signup') {
+            $this->generatePassword = FALSE;
+        }
         if ($this->generatePassword) {
             $passwd = \Yii::$app->security->generateRandomString();
         }
         $this->setPassword($passwd);
+
 
         return parent::beforeValidate();
     }
