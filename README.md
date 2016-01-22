@@ -49,43 +49,12 @@ Add following lines to the configuration file:
 ],
 ```
 
+For full instructions how to configure this module, check the [CONFIG](CONFIG.md)-file.
+
 ### Run Migrations 
 
 ```bash
 $ php yii migrate/up --migrationPath=@vendor/humanized/yii2-user/migrations
 ```
 
-## Module Configuration Options
-
-### Global Configuration Options
-
-
-
-### Grid Configuration Options
-
-### CLI Configuration Options
-
-### RBAC Integration
-
-## Graphical User Interface (GUI)
-
-Following actions are supported:
-
-> user/admin/index: User Administration Dashboard
-
-> user/account/index?id=<integer>: User Account Page
-
-
-## Command Line Interface (CLI)
-
-Following commands are supported:
-
-> php yii user/admin/create <email:required> <username:optional>
-
-> php yii user/admin/delete <email:required>
-
-The module provides
-
-## REST Interface (API)
-
-Due before version 0.5
+For full instructions on how to use this module, once configured, check the [USAGE](USAGE.md)-file.
