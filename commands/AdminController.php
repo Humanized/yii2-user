@@ -3,7 +3,7 @@
 namespace humanized\user\commands;
 
 use humanized\clihelpers\controllers\Controller;
-use humanized\user\models\PasswordReset;
+use humanized\user\models\common\User;
 use yii\helpers\Console;
 
 /**
@@ -126,25 +126,31 @@ class AdminController extends Controller {
     public function actionCreate($email, $user = NULL)
     {
         //Creates User model and sets provided variables
-        $this->setupModel($email, $user);
+        if (!$this->_setupModel($email, $user)) {
+            return $this->_exitCode;
+        }
+
+
         //Prompt for account password
-        $sendPasswordResetMail = $this->promptPassword();
+        $sendMail = $this->_prompt();
         //Save the model
         try {
             if (!$this->_model->save()) {
-                $this->_exitCode = 100;
-                $this->_msg = 'Unable to save to Database - Validator Failed';
-            } elseif ($sendPasswordResetMail) {
-                $this->actionSendPasswordResetLink($this->_model->email);
+                \yii\helpers\VarDumper::dump($this->_model->getErrors());
+                $this->_exitCode = 101;
+                $this->_msg = 'Model Save ERROR ';
             }
         } catch (\Exception $e) {
-            $this->_exitCode = 200;
+            $this->_exitCode = $e->getCode();
             $this->_msg = $e->getMessage();
         }
-        //Should remove in stable versions, but nice little fallback just in case
-        $this->showInput();
-        //Two newlines B4 program exit
-        $this->exitMsg();
+        if ($this->_exitCode === 0) {
+            $this->_msg = 'Account created with e-mail address: ' . $email;
+            if ($sendMail) {
+                $this->_msg.= ' - Confirmation mail sent';
+            }
+        }
+
         return $this->_exitCode;
     }
 
@@ -156,20 +162,36 @@ class AdminController extends Controller {
      * @param string $user
      * @return User
      */
-    private function setupModel($email, $user)
+    private function _setupModel($email, $user)
     {
-        $this->_model = new $this->_userClass([
+        $config = [
+            'scenario' => User::SCENARIO_ADMIN,
             'email' => $email,
-            'auth_key' => \Yii::$app->security->generateRandomString(),
-            'username' => (isset($user) ? $user : $email)
-        ]);
+        ];
+        if ($this->module->params['enableUserName']) {
+            $config['username'] = (isset($user) ? $user : $email);
+        }
+        $this->_model = new User($config);
+        if (!$this->_model->validate(['email'])) {
+            $this->_msg = $this->_model->errors['email'][0];
+            $this->_exitCode = 101;
+        }
+        if ($this->module->params['enableUserName']) {
+            if (!$this->_model->validate(['username'])) {
+                $this->_msg = $this->_model->errors['username'][0];
+                $this->_exitCode = 102;
+            }
+        }
+
+        return 0 === $this->_exitCode;
     }
 
-    private function promptPassword()
+    private function _prompt()
     {
         $this->hideInput();
         $passwd = $this->_promptPassword();
         $this->stdout("OK", Console::FG_GREEN, Console::BOLD);
+
         $confirm = "";
         if ($passwd !== "") {
             $confirm = $this->_promptPassword(TRUE);
@@ -177,14 +199,20 @@ class AdminController extends Controller {
 
         $this->showInput();
         //Restart when passwords do not match OR rejected confirmation
-        if (($passwd !== $confirm) || ($passwd === "" && !$this->confirm("\nGenerate Password Automatically?"))) {
+        if (($passwd !== $confirm) || ($passwd === "" && !$this->confirm("\nGenerate password and send confirmation mail?"))) {
             return $this->promptPassword();
         }
+
         //Autogenerate password
         if ($passwd === "") {
-            $passwd = \Yii::$app->security->generateRandomString();
+            $this->_model->generatePassword = TRUE;
         }
-        $this->_model->setPassword($passwd);
+        if (!$this->_model->generatePassword) {
+            $this->_model->password = $passwd;
+            $this->_model->password_confirm = $confirm;
+        }
+
+        return $this->_model->generatePassword;
     }
 
     /**

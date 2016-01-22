@@ -29,7 +29,6 @@ class User extends ActiveRecord implements IdentityInterface {
      * Supported model scenarios
      */
     const SCENARIO_ADMIN = 'admin';
-    const SCENARIO_CLI = 'console';
     const SCENARIO_LOGIN = 'login';
     const SCENARIO_SIGNUP = 'signup';
     const SCENARIO_PWDRST = 'password-reset';
@@ -44,7 +43,7 @@ class User extends ActiveRecord implements IdentityInterface {
      *
      * @var boolean 
      */
-    public $generatePassword = false;
+    public $generatePassword = FALSE;
 
     /**
      *
@@ -53,18 +52,10 @@ class User extends ActiveRecord implements IdentityInterface {
     public $password;
 
     /**
-     * Only required in GUI version of the program
+     * 
      * @var string 
      */
     public $password_confirm;
-
-    public function init()
-    {
-        parent::init();
-        if (!isset($this->status)) {
-            //  $this->status = \Yii::$app->controller->module->params['defaultStatusCode'];
-        }
-    }
 
     /**
      * @inheritdoc
@@ -112,7 +103,7 @@ class User extends ActiveRecord implements IdentityInterface {
     public function appendPasswordRules(&$rules)
     {
         $rules = array_merge($rules, [
-            ['generatePassword', 'required', 'on' => [self::SCENARIO_ADMIN, self::SCENARIO_CLI]],
+            ['generatePassword', 'required', 'on' => [self::SCENARIO_ADMIN]],
             ['password', 'string', 'min' => 8],
             ['password', 'required',
                 'when' => function($model) {
@@ -138,7 +129,6 @@ class User extends ActiveRecord implements IdentityInterface {
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_PWDRST] = [];
         $scenarios[self::SCENARIO_SIGNUP] = ['email', 'password', 'password_confirm'];
         return $scenarios;
     }
@@ -168,6 +158,7 @@ class User extends ActiveRecord implements IdentityInterface {
     public static function findByUsername($username)
     {
         $isEmail = filter_var($username, FILTER_VALIDATE_EMAIL);
+
         return static::findOne([$isEmail ? 'email' : 'username' => $username]);
     }
 
@@ -277,19 +268,24 @@ class User extends ActiveRecord implements IdentityInterface {
 
     public function beforeValidate()
     {
-        if ($this->scenario == self::SCENARIO_ADMIN || $this->scenario == self::SCENARIO_CLI || $this->scenario == self::SCENARIO_SIGNUP) {
+        if ($this->scenario == self::SCENARIO_ADMIN || $this->scenario == self::SCENARIO_SIGNUP) {
             $this->generateAuthKey();
-            $passwd = $this->password;
-            if ($this->scenario == 'signup') {
-                $this->generatePassword = FALSE;
-            }
-            if ($this->generatePassword) {
-                $passwd = \Yii::$app->security->generateRandomString();
-            }
-            $this->setPassword($passwd);
+            $this->_generatePassword();
         }
 
         return parent::beforeValidate();
+    }
+
+    private function _generatePassword()
+    {
+        $passwd = $this->password;
+        if ($this->scenario == self::SCENARIO_SIGNUP) {
+            $this->generatePassword = FALSE;
+        }
+        if ($this->generatePassword) {
+            $passwd = \Yii::$app->security->generateRandomString();
+        }
+        $this->setPassword($passwd);
     }
 
     public function afterSave($insert, $changedAttributes)
