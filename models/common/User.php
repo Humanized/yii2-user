@@ -88,11 +88,11 @@ class User extends ActiveRecord implements IdentityInterface {
         }
         if (\Yii::$app->controller->module->params['enableStatusCodes']) {
             $rules = array_merge($rules, [
-                ['status', 'default', 'value' => 10],
+                ['status', 'default', 'value' => \Yii::$app->controller->module->params['defaultStatusCode']],
                 ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])]
             ]);
         }
-        if (\Yii::$app->controller->params['enableUserName']) {
+        if (\Yii::$app->controller->module->params['enableUserName']) {
             $rules = array_merge($rules, [['username', 'unique']]);
         }
         return $rules;
