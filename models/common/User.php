@@ -71,10 +71,12 @@ class User extends ActiveRecord implements IdentityInterface {
 
             ['email', 'unique'],
             ['email', 'email'],
+            
         ];
 
         if (\Yii::$app->controller->module->params['enablePasswords']) {
             $rules = array_merge($rules, [
+                ['generatePassword','required'],
                 ['password', 'required'],
                 ['password', 'string', 'min' => 8],
                 ['password', 'required', 'when' => function($model) {
