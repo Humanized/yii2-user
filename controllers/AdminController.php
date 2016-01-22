@@ -10,9 +10,9 @@ class AdminController extends Controller {
 
     public function actionIndex()
     {
-        $model = new User();
+        $model = new User(['scenario' => User::SCENARIO_ADMIN]);
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            $model = new User(); //reset model
+            $model = new User(['scenario' => User::SCENARIO_ADMIN]); //reset model
         }
 
         $searchModel = new UserSearch();

@@ -24,10 +24,20 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface {
 
+    /**
+     * Supported model scenarios
+     */
+    const SCENARIO_ADMIN = 'admin';
+    const SCENARIO_CLI = 'console';
     const SCENARIO_LOGIN = 'login';
     const SCENARIO_SIGNUP = 'signup';
     const SCENARIO_PWDRST = 'password-reset';
-    const SCENARIO_ADMIN = 'admin';
+
+    /**
+     * Default model status modes
+     */
+    const STATUS_INACTIVE = 0;
+    const STATUS_ACTIVE = 10;
 
     /**
      *
@@ -46,6 +56,14 @@ class User extends ActiveRecord implements IdentityInterface {
      * @var string 
      */
     public $password_confirm;
+
+    public function init()
+    {
+        parent::init();
+        if (!isset($this->status)) {
+          //  $this->status = \Yii::$app->controller->module->params['defaultStatusCode'];
+        }
+    }
 
     /**
      * @inheritdoc
@@ -73,36 +91,47 @@ class User extends ActiveRecord implements IdentityInterface {
     public function rules()
     {
         $rules = [
-
+            ['email', 'required'],
             ['email', 'unique'],
             ['email', 'email'],
         ];
-
+        if (\Yii::$app->controller->module->params['enableUserName']) {
+            $rules[] = ['username', 'unique'];
+        }
         if (\Yii::$app->controller->module->params['enablePasswords']) {
-            $rules = array_merge($rules, [
-                ['generatePassword', 'required'],
-                ['password', 'required'],
-                ['password', 'string', 'min' => 8],
-                ['password', 'required', 'when' => function($model) {
-                        return !$model->generatePassword;
-                    }],
-                ['password_confirm', 'required', 'when' => function($model) {
-                        return !$model->generatePassword;
-                    }],
-                ['password_confirm', 'compare', 'compareAttribute' => 'password', 'message' => "Passwords don't match"],
-            ]);
+            $this->appendPasswordRules($rules);
         }
         if (\Yii::$app->controller->module->params['enableStatusCodes']) {
-            $rules = array_merge($rules, [
-                ['status', 'required'],
-                ['status', 'default', 'value' => \Yii::$app->controller->module->params['defaultStatusCode']],
-                ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])]
-            ]);
-        }
-        if (\Yii::$app->controller->module->params['enableUserName']) {
-            $rules = array_merge($rules, [['username', 'unique']]);
+            $rules[] = ['status', 'default', 'value' => \Yii::$app->controller->module->params['defaultStatusCode']];
+            $rules[] = ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])];
         }
         return $rules;
+    }
+
+    public function appendPasswordRules(&$rules)
+    {
+        $rules = array_merge($rules, [
+            ['generatePassword', 'required', 'on' => [self::SCENARIO_ADMIN, self::SCENARIO_CLI]],
+            ['password', 'string', 'min' => 8],
+            ['password', 'required',
+                'when' => function($model) {
+                    return !$model->generatePassword;
+                },
+                'whenClient' => "function (attribute, value) {
+                                    return $('#generate-password').checked==false;
+                                }"
+            ],
+            ['password_confirm', 'required',
+                'on' => [self::SCENARIO_SIGNUP, self::SCENARIO_ADMIN],
+                'when' => function($model) {
+                    return !$model->generatePassword;
+                },
+                'whenClient' => "function (attribute, value) {
+                                     return $('#generate-password').checked==false;
+                                }"
+            ],
+            ['password_confirm', 'compare', 'compareAttribute' => 'password', 'message' => "Passwords don't match"],
+        ]);
     }
 
     public function scenarios()
@@ -247,16 +276,17 @@ class User extends ActiveRecord implements IdentityInterface {
 
     public function beforeValidate()
     {
-        $this->generateAuthKey();
-        $passwd = $this->password;
-        if ($this->scenario == 'signup') {
-            $this->generatePassword = FALSE;
+        if ($this->scenario == self::SCENARIO_ADMIN || $this->scenario == self::SCENARIO_CLI || $this->scenario == self::SCENARIO_SIGNUP) {
+            $this->generateAuthKey();
+            $passwd = $this->password;
+            if ($this->scenario == 'signup') {
+                $this->generatePassword = FALSE;
+            }
+            if ($this->generatePassword) {
+                $passwd = \Yii::$app->security->generateRandomString();
+            }
+            $this->setPassword($passwd);
         }
-        if ($this->generatePassword) {
-            $passwd = \Yii::$app->security->generateRandomString();
-        }
-        $this->setPassword($passwd);
-
 
         return parent::beforeValidate();
     }
@@ -264,6 +294,7 @@ class User extends ActiveRecord implements IdentityInterface {
     public function afterSave($insert, $changedAttributes)
     {
         if ($insert && $this->generatePassword) {
+
             $model = new PasswordReset(['email' => $this->email]);
             if ($model->validate() && $model->sendEmail()) {
                 return parent::afterSave($insert, $changedAttributes);

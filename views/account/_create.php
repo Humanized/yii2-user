@@ -22,7 +22,7 @@ if ($model->scenario != 'signup') {
         echo $form->field($model, 'status')->dropDownList(\humanized\user\components\GUIHelper::getStatusList(), ['prompt' => 'Select Status Value']);
     }
 //Optional Password Autogeneration
-    echo $form->field($model, 'generatePassword')->checkBox(['attribute' => 'generatePassword',
+    echo $form->field($model, 'generatePassword')->checkBox(['attribute' => 'generatePassword', 'id' => 'generate-password', 'onclick' => "this.checked ?  $('#password-fields').hide() : $('#password-fields').show()",
         'format' => 'boolean']);
 }
 ?>

@@ -140,7 +140,7 @@ class Module extends \yii\base\Module {
     public $statusCodeTableId = 'id';
     public $statusCodeTableName = 'name';
     public $statusCodes = [];
-    public $defaultStatusCode = 0;
+    public $defaultStatusCode = 10;
 
     public function init()
     {
