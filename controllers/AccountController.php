@@ -53,9 +53,9 @@ class AccountController extends Controller {
         if (!\Yii::$app->controller->module->params['enableSignUp']) {
             throw new \yii\web\NotFoundHttpException('Page not found.');
         }
-        $model = new SignupForm();
+        $model = new User();
         if ($model->load(\Yii::$app->request->post())) {
-            if ($user = $model->signup()) {
+            if ($user = $model->save()) {
                 if (\Yii::$app->getUser()->login($user)) {
                     return $this->goHome();
                 }
