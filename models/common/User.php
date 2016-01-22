@@ -130,6 +130,7 @@ class User extends ActiveRecord implements IdentityInterface {
     {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_SIGNUP] = ['email', 'password', 'password_confirm'];
+        $scenarios[self::SCENARIO_PWDRST] = [];
         return $scenarios;
     }
 
