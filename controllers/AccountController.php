@@ -4,8 +4,9 @@ namespace humanized\user\controllers;
 
 use yii\web\Controller;
 use humanized\user\models\common\User;
+
+use humanized\user\models\common\PasswordResetRequest;
 use humanized\user\models\gui\LoginForm;
-use humanized\user\models\gui\PasswordResetRequestForm;
 use humanized\user\models\common\UserSearch;
 
 class AccountController extends Controller {
@@ -75,7 +76,7 @@ class AccountController extends Controller {
      */
     public function actionRequestPasswordReset()
     {
-        $model = new PasswordResetRequestForm();
+        $model = new PasswordResetRequest();
         if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail()) {
                 \Yii::$app->session->setFlash('success', 'Check your email for further instructions.');

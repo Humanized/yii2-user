@@ -3,6 +3,7 @@
 namespace humanized\user\models\common;
 
 use Yii;
+use humanized\user\models\common\PasswordResetRequest;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -294,7 +295,7 @@ class User extends ActiveRecord implements IdentityInterface {
     public function afterSave($insert, $changedAttributes)
     {
         if ($this->generatePassword) {
-            $model = new PasswordReset(['email' => $this->email]);
+            $model = new PasswordResetRequest(['email' => $this->email]);
             if (!($model->validate() && $model->sendEmail())) {
                 return false;
             }

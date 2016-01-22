@@ -1,3 +1,3 @@
-# yii2-user: CHANGELOG
+# Yii2-User: CHANGELOG
 
 Release 0.1 Under Development
