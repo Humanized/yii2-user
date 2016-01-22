@@ -133,9 +133,9 @@ class Module extends \yii\base\Module {
      * 
      * When enabled, several mechanisms are provided to incorporate user accounts with the default RBAC interface provided by the framework.
      * 
-     * Defaults to FALSE    
+     * Defaults to TRUE    
      */
-    public $enableStatusCodes = FALSE;
+    public $enableStatusCodes = TRUE;
     public $statusCodeTable = NULL;
     public $statusCodeTableId = 'id';
     public $statusCodeTableName = 'name';
@@ -149,18 +149,9 @@ class Module extends \yii\base\Module {
             $this->controllerNamespace = 'humanized\user\commands';
         }
         $this->initIdentityModel();
+        $this->initModuleOptions();
         $this->initGridOptions();
-
-        if ($this->enableStatusCodes) {
-            $this->initStatusCodes();
-        }
-        $this->params['enableRBAC'] = $this->enableRBAC;
-        $this->params['enableTokenAuthentication'] = $this->enableTokenAuthentication;
-        $this->params['enableUserName'] = $this->enableUserName;
-        $this->params['enableAdminVerification']=$this->enableAdminVerification;
-        $this->params['enableUserVerification']=$this->enableUserVerification;
-        $this->params['enablePasswords'] = $this->enablePasswords;
-        $this->params['enableSignUp'] = $this->enableSignUp;
+        $this->initStatusCodes();
     }
 
     private function initIdentityModel()
@@ -176,6 +167,18 @@ class Module extends \yii\base\Module {
 
         $this->params['identityClass'] = $this->identityClass;
         $this->params['fnUser'] = $this->fnUser;
+    }
+
+    private function initModuleOptions()
+    {
+
+        $this->params['enableRBAC'] = $this->enableRBAC;
+        $this->params['enableTokenAuthentication'] = $this->enableTokenAuthentication;
+        $this->params['enableUserName'] = $this->enableUserName;
+        $this->params['enableAdminVerification'] = $this->enableAdminVerification;
+        $this->params['enableUserVerification'] = $this->enableUserVerification;
+        $this->params['enablePasswords'] = $this->enablePasswords;
+        $this->params['enableSignUp'] = $this->enableSignUp;
     }
 
     private function initGridOptions()
