@@ -17,7 +17,7 @@ if (\Yii::$app->controller->module->params['enableUserName']) {
 }
 echo $form->field($model, 'email')->input('email');
 
-if (!$model->scenario = 'signup') {
+if ($model->scenario != 'signup') {
     if (\Yii::$app->controller->module->params['enableStatusCodes']) {
         echo $form->field($model, 'status')->dropDownList(\humanized\user\components\GUIHelper::getStatusList(), ['prompt' => 'Select Status Value']);
     }

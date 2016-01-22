@@ -43,8 +43,9 @@ class PasswordReset extends Model {
                     'email' => $this->email,
         ]);
 
-        if ($user) {
 
+        if ($user) {
+            $user->setScenario(User::SCENARIO_PWDRST_TOKEN);
             if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
                 $user->generatePasswordResetToken();
             }

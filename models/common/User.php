@@ -24,6 +24,11 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface {
 
+    const SCENARIO_LOGIN = 'login';
+    const SCENARIO_SIGNUP = 'signup';
+    const SCENARIO_PWDRST = 'password-reset';
+    const SCENARIO_ADMIN = 'admin';
+
     /**
      *
      * @var boolean 
@@ -103,7 +108,8 @@ class User extends ActiveRecord implements IdentityInterface {
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['signup'] = ['email', 'password', 'password_confirm'];
+        $scenarios[self::SCENARIO_PWDRST] = [];
+        $scenarios[self::SCENARIO_SIGNUP] = ['email', 'password', 'password_confirm'];
         return $scenarios;
     }
 
@@ -238,7 +244,6 @@ class User extends ActiveRecord implements IdentityInterface {
     {
         $this->password_reset_token = null;
     }
-    
 
     public function beforeValidate()
     {
