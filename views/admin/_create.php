@@ -12,7 +12,7 @@ $form = ActiveForm::begin([
             ],
         ]);
 /* Form Fields */
-if (!\Yii::$app->controller->module->params['emailOnly']) {
+if (\Yii::$app->controller->module->params['enableUserName']) {
     echo $form->field($model, 'username')->input('username');
 }
 echo $form->field($model, 'email')->input('email');
