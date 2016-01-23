@@ -4,6 +4,7 @@ namespace humanized\user\commands;
 
 use humanized\clihelpers\controllers\Controller;
 use humanized\user\models\common\User;
+use humanized\user\models\common\PasswordResetRequest;
 use yii\helpers\Console;
 
 /**
@@ -24,9 +25,7 @@ use yii\helpers\Console;
  * @version 0.1
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
- * 
- * 
- * 
+ *
  */
 class AdminController extends Controller {
 
@@ -76,7 +75,7 @@ class AdminController extends Controller {
             }
         } else {
             $this->_exitCode = 100;
-            $this->_msg = "User Account linked to $user Not Found";
+            $this->_msg = "Could not find account linked to $user";
         }
 
         $this->exitMsg();
@@ -95,7 +94,7 @@ class AdminController extends Controller {
 
     private function sendMail($email)
     {
-        $model = new PasswordReset(['email' => $email]);
+        $model = new PasswordResetRequest(['email' => $email]);
         if ($model->validate() && $model->sendEmail()) {
             $this->_msg = 'Password reset link successfully sent to ' . $email;
         } else {

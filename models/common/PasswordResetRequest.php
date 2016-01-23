@@ -62,4 +62,14 @@ class PasswordResetRequest extends Model {
         return false;
     }
 
+    public function loadMail($id)
+    {
+        $user = User::findOne($id);
+        if (!isset($user)) {
+            return FALSE;
+        }
+        $this->email = $user->email;
+        return TRUE;
+    }
+
 }

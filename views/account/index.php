@@ -1,6 +1,9 @@
 <?php
 
 use yii\widgets\DetailView;
+use yii\bootstrap\Modal;
+use yii\bootstrap\Html;
+
 $this->params['breadcrumbs'][] = 'User Administration';
 $this->params['breadcrumbs'][] = 'Accounts';
 ?>
@@ -16,8 +19,8 @@ $this->params['breadcrumbs'][] = 'Accounts';
     </aside>
 
     <div class="col-md-8">
-        <?=
-        DetailView::widget([
+        <?php
+        echo DetailView::widget([
             'model' => $model,
             'attributes' => [
                 'email:email', // title attribute (in plain text)
@@ -25,7 +28,20 @@ $this->params['breadcrumbs'][] = 'Accounts';
                 'updated_at:datetime', // creation date formatted as datetime
             ],
         ]);
+
+        echo Html::a('Reset Password', ['request-password-reset', 'id' => $model->id], ['class' => 'btn btn-success'])
+
+        /*
+          Modal::begin([
+          'header' => '<h4>Hello world</h4>',
+          'toggleButton' => ['label' => 'Generate Tole,'],
+          ]);
+          echo 'Testing';
+          Modal::end();
+         * 
+         */
         ?>
+
     </div>
 
 </div>

@@ -4,7 +4,6 @@ namespace humanized\user\controllers;
 
 use yii\web\Controller;
 use humanized\user\models\common\User;
-
 use humanized\user\models\common\PasswordResetRequest;
 use humanized\user\models\gui\LoginForm;
 use humanized\user\models\common\UserSearch;
@@ -74,18 +73,18 @@ class AccountController extends Controller {
      *
      * @return mixed
      */
-    public function actionRequestPasswordReset()
+    public function actionRequestPasswordReset($id = NULL)
     {
         $model = new PasswordResetRequest();
-        if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
+        if (isset($id) ? $model->loadMail($id) : $model->load(\Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail()) {
                 \Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
-                return $this->goHome();
+
+                return isset($id) ? $this->redirect(['index', 'id' => $id]) : $this->goHome();
             } else {
                 \Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for email provided.');
             }
         }
-
         return $this->render('requestPasswordResetToken', [
                     'model' => $model,
         ]);
