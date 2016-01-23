@@ -8,47 +8,6 @@ use humanized\user\models\common\UserSearch;
 
 class AdminController extends Controller {
 
-    public function beforeAction($action)
-    {
-        if (\Yii::$app->user->isGuest) {
-            throw new \yii\web\NotFoundHttpException('Page not found.');
-        }
-
-
-        $accessGranted = NULL;
-        $error = 'User Module: accessAdmin parameter of permissions array is incorrectly set';
-
-        $accessAdmin = $this->module->params['permissions']['accessAdmin'];
-        switch (gettype($accessAdmin)) {
-            case "boolean": {
-                    $accessGranted = $accessAdmin;
-                    break;
-                }
-            case "string": {
-                    if ($this->module->params['enableRBAC']) {
-                        $accessGranted = \Yii::$app->user->can($accessAdmin);
-                    } else {
-                        $error = 'User Module: RBAC not Enabled';
-                    }
-                    break;
-                }
-            case "array": {
-                    $accessGranted = NULL;
-                    break;
-                }
-            default: {
-                    $accessGranted = NULL;
-                    break;
-                }
-        }
-        if (!isset($accessGranted)) {
-
-            throw new \yii\web\BadRequestHttpException($error);
-        }
-
-        return $accessGranted && parent::beforeAction($action);
-    }
-
     /**
      * 
      * @return mixed

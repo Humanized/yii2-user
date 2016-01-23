@@ -189,8 +189,6 @@ class Module extends \yii\base\Module {
 
     private function initModuleOptions()
     {
-
-        $this->params['enableRBAC'] = $this->enableRBAC;
         $this->params['enableTokenAuthentication'] = $this->enableTokenAuthentication;
         $this->params['enableUserName'] = $this->enableUserName;
         $this->params['enableAdminVerification'] = $this->enableAdminVerification;
@@ -248,6 +246,79 @@ class Module extends \yii\base\Module {
         }
         //array_merge function takes the union and the duplicate keys are overwritten
         $this->params['permissions'] = array_merge($permissions, $this->permissions);
+    }
+
+    public function beforeAction($action)
+    {
+        $accessGranted = TRUE;
+        $error = 'Page not found.';
+
+
+
+        if (!$accessGranted) {
+            throw new \yii\web\NotFoundHttpException($error);
+        }
+        return $accessGranted && parent::beforeAction($action);
+    }
+
+    private function _checkProtected($action, &$accessGranted, &$error)
+    {
+        $adminAccess = NULL;
+        $this->_checkAdminAccess($adminAccess, $error);
+
+        if ($action->id == 'index') {
+            if (\Yii::$app->user->isGuest) {
+                throw new \yii\web\NotFoundHttpException($error);
+            }
+            if (\Yii::$app->controller->id == 'admin') {
+                $accessGranted = $adminAccess;
+            }
+        }
+    }
+
+    private function _checkAdminAccess(&$accessGranted, &$error)
+    {
+        $this->_switchPermission($accessGranted, $error);
+        if (!isset($accessGranted)) {
+            throw new \yii\web\BadRequestHttpException($error);
+        }
+    }
+
+    private function _switchPermission(&$accessGranted, &$error)
+    {
+        $accessAdmin = $this->params['permissions']['accessAdmin'];
+        switch (gettype($accessAdmin)) {
+            case "boolean": {
+                    $accessGranted = $accessAdmin;
+                    break;
+                }
+            case "string": {
+                    $this->_caseStringPermission($accessGranted, $error);
+                    break;
+                }
+            case "array": {
+                    $accessGranted = NULL;
+                    break;
+                }
+            default: {
+                    $error = 'Yii2-User: accessAdmin parameter incorrectly set';
+                    $accessGranted = NULL;
+                    break;
+                }
+        }
+        $this->params['permissions']['accessAdmin'] = $accessGranted;
+    }
+
+    private function _caseStringPermission(&$access, &$error)
+    {
+        $user = \Yii::$app->user;
+        $permission = (string) $this->params['permissions']['accessAdmin'];
+        $error.= "($user->id::$permission)";
+
+        if (!$this->params['enableRBAC']) {
+            $error = 'User Module: RBAC not Enabled';
+        }
+        $access = $user->can($permission);
     }
 
 }
