@@ -9,7 +9,7 @@ namespace humanized\user;
  * 
  * Though implementations vary, the code interface as provided by the advanced template has been ported in it's entirety.
  * 
- * This allows using the module (with it's default settings)  to be used as a drop-in replacement for default user managment,
+ * This allows using the module (with it's default settings) to be used as a drop-in replacement for default user managment,
  * without having to worry about breaking code existing code (other than namespace renaming).   
  * 
  *  
@@ -119,16 +119,6 @@ class Module extends \yii\base\Module {
 
     /**
      * @since 0.1
-     * @var boolean Enable role cased authorisation control
-     * 
-     * When enabled, several mechanisms are provided to incorporate user accounts with the default RBAC interface provided by the framework.
-     * 
-     * Defaults to FALSE    
-     */
-    public $enableRBAC = FALSE;
-
-    /**
-     * @since 0.1
      * @var boolean Enable account status mechanism 
      * 
      * When enabled, several mechanisms are provided to incorporate user accounts with the default RBAC interface provided by the framework.
@@ -142,6 +132,30 @@ class Module extends \yii\base\Module {
     public $statusCodes = [];
     public $defaultStatusCode = 10;
 
+    /**
+     * @since 0.1
+     * @var array<mixed> - When enableRBAC is pr 
+     */
+    public $permissions = [
+    ];
+
+    /**
+     *
+     * @var array<mixed> 
+     */
+    public $adminFallback = [];
+
+    /**
+     * @since 0.1
+     * @var boolean Enable role cased authorisation control
+     * 
+     * When enabled, several mechanisms are provided to incorporate user accounts with the default RBAC interface provided by the framework.
+     * 
+     * Defaults to FALSE    
+     */
+    public $enableRBAC = FALSE;
+    public $rbacSettings = [];
+
     public function init()
     {
         parent::init();
@@ -152,6 +166,10 @@ class Module extends \yii\base\Module {
         $this->initModuleOptions();
         $this->initGridOptions();
         $this->initStatusCodes();
+
+        //Permission Related initialisation
+        $this->initRBAC();
+        $this->initPermission();
     }
 
     private function initIdentityModel()
@@ -203,6 +221,33 @@ class Module extends \yii\base\Module {
             $this->params['statusCodes'] = [0 => 'INACTIVE', 10 => 'ACTIVE'];
         }
         $this->params['defaultStatusCode'] = $this->defaultStatusCode;
+    }
+
+    /**
+     * 
+     */
+    private function initRBAC()
+    {
+        $this->params['enableRBAC'] = $this->enableRBAC;
+    }
+
+    /**
+     * Run after initRBAC method
+     */
+    private function initPermission()
+    {
+        $permissions = [
+            'accessAdmin' => 'test',
+            'assignStatus' => TRUE,
+            'assignRole' => TRUE,
+            'generateToken' => TRUE,
+        ];
+
+        foreach ($this->permissions as $key => $value) {
+            $permissions[$key] = $value;
+        }
+        //array_merge function takes the union and the duplicate keys are overwritten
+        $this->params['permissions'] = array_merge($permissions, $this->permissions);
     }
 
 }

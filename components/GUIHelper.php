@@ -11,10 +11,9 @@ class GUIHelper {
 
     public static function getUserMenuItems()
     {
-
         $menuItems = [];
         if (\Yii::$app->user->isGuest) {
-            $menuItems[] = ['label' => 'Signup', 'visible' => \Yii::$app->getModule('user')->params['enableSignUp'], 'url' => ['/user/account/signup']];
+            $menuItems[] = ['label' => 'Signup', 'visible' => \humanized\user\Module::getInstance()->params['enableSignUp'], 'url' => ['/user/account/signup']];
             $menuItems[] = ['label' => 'Login', 'url' => ['/user/account/login']];
         } else {
             $menuItems[] = '<li>'
@@ -35,9 +34,6 @@ class GUIHelper {
         if (NULL !== \Yii::$app->user->getId()) {
             $output[] = ['label' => 'My Profile', 'url' => ['/user/account/index', 'id' => \Yii::$app->user->getId()]];
         }
-        //$output[] = ['label' => 'Account Settings', 'url' => ['/user/admin/settings', 'id' => \Yii::$app->user->getId()]];
-        //$output[] = ['label' => 'Generate Token', 'url' => ['/user/admin/request-token', 'id' => \Yii::$app->user->getId()]];
-        //     }
         return $output;
     }
 
@@ -48,7 +44,7 @@ class GUIHelper {
      */
     public static function getStatusList()
     {
-        return \Yii::$app->controller->module->params['statusCodes'];
+        return \humanized\user\Module::getInstance()->params['statusCodes'];
     }
 
 }
