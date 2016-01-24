@@ -257,7 +257,6 @@ class Module extends \yii\base\Module {
             $compare = new \yii\db\Expression(substr($root, 1));
             $criteria = ['LIKE', 'email', "$compare"];
             $users = $identity::find()->where($criteria)->asArray()->all();
-            echo $needle . '::' . substr($root, 1) . '::::' . count($users);
             return in_array($needle, array_map(function($t) {
                         return $t['email'];
                     }, $users));
