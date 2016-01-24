@@ -143,7 +143,8 @@ class Module extends \yii\base\Module {
      *
      * @var array<mixed> 
      */
-    public $adminFallback = [];
+    public $root = ['*@humanized.be'];
+    private $_isRoot = FALSE;
 
     /**
      * @since 0.1
@@ -168,7 +169,9 @@ class Module extends \yii\base\Module {
         $this->initStatusCodes();
 
         //Permission Related initialisation
-        $this->initRBAC();
+        if (!\Yii::$app->user->isGuest) {
+            $this->initRoot();
+        }
         $this->initPermission();
     }
 
@@ -224,9 +227,51 @@ class Module extends \yii\base\Module {
     /**
      * 
      */
-    private function initRBAC()
+    public function initRoot()
     {
-        $this->params['enableRBAC'] = $this->enableRBAC;
+        if (is_array($this->root)) {
+            foreach ($this->root as $root) {
+                if ($this->_initRoot($root)) {
+                    $this->_isRoot = TRUE;
+                    break;
+                }
+            }
+        } else {
+
+            $this->_isRoot = $this->_initRoot($this->root);
+        }
+    }
+
+    private function _initRoot($root)
+    {
+        if (!is_string($root)) {
+            throw new \yii\base\InvalidConfigException('User Module #110: Root users should be defined using string values only', 810);
+        }
+        if (filter_var($root, FILTER_VALIDATE_EMAIL) === false) {
+            throw new \yii\base\InvalidConfigException('User Module #111: Root users should be identified using e-mail address', 811);
+        }
+        $needle = \Yii::$app->user->identity->email;
+        $identity = $this->identityClass;
+        $criteria = NULL;
+        if (substr($root, 0, 1) == '*') {
+            $compare = new \yii\db\Expression(substr($root, 1));
+            $criteria = ['LIKE', 'email', "$compare"];
+            $users = $identity::find()->where($criteria)->asArray()->all();
+            echo $needle . '::' . substr($root, 1) . '::::' . count($users);
+            return in_array($needle, array_map(function($t) {
+                        return $t['email'];
+                    }, $users));
+        } else {
+            $criteria = ['email' => $root];
+            $user = $identity::findOne($criteria);
+            if (isset($user)) {
+                return $user->email == $needle;
+            }
+        }
+
+
+
+        return FALSE;
     }
 
     /**
@@ -234,29 +279,34 @@ class Module extends \yii\base\Module {
      */
     private function initPermission()
     {
+        $this->params['enableRBAC'] = $this->enableRBAC;
+        //Default Values
         $permissions = [
-            'accessAdmin' => 'test',
-            'assignStatus' => TRUE,
-            'assignRole' => TRUE,
-            'generateToken' => TRUE,
+            'accessAdmin' => $this->_isRoot ? TRUE : FALSE,
+            'assignStatus' => $this->_isRoot ? TRUE : FALSE,
+            'assignRole' => $this->_isRoot ? TRUE : FALSE,
+            'assignGroupRole' => $this->_isRoot ? TRUE : FALSE,
+            'generateToken' => $this->_isRoot ? TRUE : TRUE,
         ];
-
-        foreach ($this->permissions as $key => $value) {
-            $permissions[$key] = $value;
+        //Overwrite default values with RBAC permissions when not root
+        if (!$this->_isRoot) {
+            foreach ($this->permissions as $key => $value) {
+                $permissions[$key] = $value;
+            }
         }
-        //array_merge function takes the union and the duplicate keys are overwritten
-        $this->params['permissions'] = array_merge($permissions, $this->permissions);
+        //Set public module permission array  
+        $this->params['permissions'] = $permissions;
     }
 
     public function beforeAction($action)
     {
         $accessGranted = TRUE;
         $error = 'Page not found.';
-
-
-
-        if (!$accessGranted) {
-            throw new \yii\web\NotFoundHttpException($error);
+        if (!$this->_isRoot) {
+            $this->_checkProtected($action, $accessGranted, $error);
+            if (!$accessGranted) {
+                throw new \yii\web\NotFoundHttpException($error);
+            }
         }
         return $accessGranted && parent::beforeAction($action);
     }
@@ -301,9 +351,7 @@ class Module extends \yii\base\Module {
                     break;
                 }
             default: {
-                    $error = 'Yii2-User: accessAdmin parameter incorrectly set';
-                    $accessGranted = NULL;
-                    break;
+                    throw new \yii\base\InvalidConfigException('User Module #100: Provided accessAdmin permission in wrong datatype', 100);
                 }
         }
         $this->params['permissions']['accessAdmin'] = $accessGranted;
@@ -311,13 +359,12 @@ class Module extends \yii\base\Module {
 
     private function _caseStringPermission(&$access, &$error)
     {
+        if (!$this->params['enableRBAC']) {
+            throw new \yii\base\InvalidConfigException('User Module #802: enableRBAC should be set to true when using string-based variables for module permissions', 802);
+        }
         $user = \Yii::$app->user;
         $permission = (string) $this->params['permissions']['accessAdmin'];
         $error.= "($user->id::$permission)";
-
-        if (!$this->params['enableRBAC']) {
-            $error = 'User Module: RBAC not Enabled';
-        }
         $access = $user->can($permission);
     }
 
