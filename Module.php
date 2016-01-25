@@ -37,6 +37,10 @@ namespace humanized\user;
  */
 class Module extends \yii\base\Module {
 
+    /**
+     *
+     * @var UserInterface 
+     */
     public $identityClass = NULL;
     public $fnUser = NULL;
 
@@ -121,7 +125,6 @@ class Module extends \yii\base\Module {
      * @since 0.1
      * @var boolean Enable account status mechanism 
      * 
-     * When enabled, several mechanisms are provided to incorporate user accounts with the default RBAC interface provided by the framework.
      * 
      * Defaults to TRUE    
      */
@@ -134,16 +137,49 @@ class Module extends \yii\base\Module {
 
     /**
      * @since 0.1
-     * @var array<mixed> - When enableRBAC is pr 
+     * @var array<mixed> - Module permission configuration array
+     * 
+     * Several permission variables can be set to allow access seggregation to the various facilities provided by the module .
+     * 
+     * Boolean flags can be assigned to manage access control.
+     * When the enableRBAC flag is set to TRUE, the built-in RBAC interface is employed, as setup through the authManager component. 
+     * In this case, string-based permission-name can be configured to manage access control.
+     *
+     * 
+     * Following configuration options are supported:
+     * 
+     * 
+     * 
+     * accessAdmin            Permission providing account complete user management administration access. (Default FALSE)
+     * 
+     * accessGroupAdmin       Permission providing account user management administration access for accounts lower-or-equal-to access level. (Default FALSE)
+     * 
+     * allowTokenGeneration   Permission providing account to generate an authentication token. 
+     *                        Only useful when enableTokenAuthentication-flag option is set. (Default TRUE)
+     * 
+     *  
      */
     public $permissions = [
     ];
 
     /**
-     *
-     * @var array<mixed> 
+     * @since 0.1
+     * @var mixed Single or list of root user(s) identified through e-mail address
+     * 
+     * When signed-on using a qualified account, all configurable module permission mechanisms are bypassed.
+     * allowing full-access to all protected actions.
+     * 
+     * Bulk root access can be given in bulk using following convention: 
+     * *@domain.it provides root access to all accounts registered in the system having an e-mail addressess ending with "@domain.it"
+     * 
      */
     public $root = ['*@humanized.be'];
+
+    /**
+     *
+     * @since 0.1
+     * @var boolean Internal flag storing if current session is run as root 
+     */
     private $_isRoot = FALSE;
 
     /**
