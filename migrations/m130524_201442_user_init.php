@@ -10,7 +10,10 @@ class m130524_201442_user_init extends Migration {
     public function init()
     {
         parent::init();
-        $this->_module = \humanized\user\Module::getInstance();
+
+       
+
+        $this->_module = \Yii::$app->getModule('user');
 
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
@@ -57,7 +60,7 @@ class m130524_201442_user_init extends Migration {
                 return FALSE;
             }
             $this->createTable($statusTable, [$status_id => $this->smallInteger(), $status_name => $this->string(20)], $this->_tableOptions);
-            $this->addPrimaryKey('pk_status',$statusTable, $status_id);
+            $this->addPrimaryKey('pk_status', $statusTable, $status_id);
         }
         return TRUE;
     }

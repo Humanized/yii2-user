@@ -174,7 +174,7 @@ class User extends ActiveRecord implements IdentityInterface {
      */
     public static function findByUsername($username)
     {
-        
+
         $isEmail = filter_var($username, FILTER_VALIDATE_EMAIL);
         if (!\humanized\user\Module::getInstance()->params['enableUserName'] && !$isEmail) {
             return FALSE;

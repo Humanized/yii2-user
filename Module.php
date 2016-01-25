@@ -205,7 +205,7 @@ class Module extends \yii\base\Module {
         $this->initStatusCodes();
 
         //Permission Related initialisation
-        if (!\Yii::$app->user->isGuest) {
+        if (!php_sapi_name() == "cli" && !\Yii::$app->user->isGuest) {
             $this->initRoot();
         }
         $this->initPermission();
@@ -250,6 +250,8 @@ class Module extends \yii\base\Module {
     private function initStatusCodes()
     {
         $this->params['enableStatusCodes'] = $this->enableStatusCodes;
+
+        $this->params['statusCodeTable'] = $this->statusCodeTable;
         if (isset($this->statusCodeTable)) {
             //Load DB values from provided table to the statuscodes variable 
         } elseif (empty($this->statusCodes)) {
