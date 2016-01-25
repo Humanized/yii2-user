@@ -24,7 +24,7 @@
     ],
     "require": {
         "yiisoft/yii2": "@dev",
-        "humanized/yii2-clihelpers": "*"
+        "humanized/yii2-clihelpers": "@dev"
     },
     "autoload": {
         "psr-4": {
