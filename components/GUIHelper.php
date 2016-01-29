@@ -9,12 +9,13 @@ use yii\helpers\Html;
  */
 class GUIHelper {
 
-    public static function getUserMenuItems()
+    public static function getAuthenticationItems()
     {
+        
 
         $menuItems = [];
         if (\Yii::$app->user->isGuest) {
-            //$menuItems[] = ['label' => 'Signup', 'visible' => \humanized\user\Module::getInstance()->params['enableSignUp'], 'url' => ['/user/account/signup']];
+  //          $menuItems[] = ['label' => 'Signup', 'visible' => \humanized\user\Module::getInstance()->params['enableSignUp'], 'url' => ['/user/account/signup']];
             $menuItems[] = ['label' => 'Login', 'url' => ['/user/account/login']];
         } else {
             $menuItems[] = '<li>'
@@ -25,6 +26,7 @@ class GUIHelper {
                     . Html::endForm()
                     . '</li>';
         }
+
         return $menuItems;
     }
 
