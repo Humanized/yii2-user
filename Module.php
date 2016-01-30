@@ -204,8 +204,9 @@ class Module extends \yii\base\Module {
         $this->initGridOptions();
         $this->initStatusCodes();
 
-        //Permission Related initialisation
-        if (!php_sapi_name() == "cli" && !\Yii::$app->user->isGuest) {
+        //Permission Related initialisation (not available when CLI)
+        if (php_sapi_name() != "cli" && !\Yii::$app->user->isGuest) {
+
             $this->initRoot();
         }
         $this->initPermission();
@@ -263,9 +264,9 @@ class Module extends \yii\base\Module {
     }
 
     /**
-     * 
+     * Parses the root parameter which is either   
      */
-    public function initRoot()
+    private function initRoot()
     {
         if (is_array($this->root)) {
             foreach ($this->root as $root) {
@@ -274,23 +275,22 @@ class Module extends \yii\base\Module {
                     break;
                 }
             }
-        } else {
-
-            $this->_isRoot = $this->_initRoot($this->root);
+            return;
         }
+        $this->_isRoot = $this->_initRoot($this->root);
     }
 
+    /**
+     * 
+     * @param type $root
+     * @return boolean
+     */
     private function _initRoot($root)
     {
-        if (!is_string($root)) {
-            throw new \yii\base\InvalidConfigException('User Module #110: Root users should be defined using string values only', 810);
-        }
-        if (filter_var($root, FILTER_VALIDATE_EMAIL) === false) {
-            throw new \yii\base\InvalidConfigException('User Module #111: Root users should be identified using e-mail address', 811);
-        }
+        $this->_validateRootInput($root);
         $needle = \Yii::$app->user->identity->email;
         $identity = $this->identityClass;
-        $criteria = NULL;
+
         if (substr($root, 0, 1) == '*') {
             $compare = new \yii\db\Expression(substr($root, 1));
             $criteria = ['LIKE', 'email', "$compare"];
@@ -305,10 +305,23 @@ class Module extends \yii\base\Module {
                 return $user->email == $needle;
             }
         }
-
-
-
         return FALSE;
+    }
+
+    /**
+     * Validates input submitted to be an e-mail address 
+     * 
+     * @param string $root a root account defined by email address 
+     * @throws \yii\base\InvalidConfigException
+     */
+    private function _validateRootInput($root)
+    {
+        if (!is_string($root)) {
+            throw new \yii\base\InvalidConfigException('Yii2 User Module: Root users should be defined using string values only', 810);
+        }
+        if (filter_var($root, FILTER_VALIDATE_EMAIL) === false) {
+            throw new \yii\base\InvalidConfigException('Yii2 User Module: Root users should be identified using e-mail address', 811);
+        }
     }
 
     /**

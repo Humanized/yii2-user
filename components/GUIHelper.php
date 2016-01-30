@@ -9,27 +9,6 @@ use yii\helpers\Html;
  */
 class GUIHelper {
 
-    public static function getAuthenticationItems()
-    {
-        
-
-        $menuItems = [];
-        if (\Yii::$app->user->isGuest) {
-  //          $menuItems[] = ['label' => 'Signup', 'visible' => \humanized\user\Module::getInstance()->params['enableSignUp'], 'url' => ['/user/account/signup']];
-            $menuItems[] = ['label' => 'Login', 'url' => ['/user/account/login']];
-        } else {
-            $menuItems[] = '<li>'
-                    . Html::beginForm(['/user/account/logout'], 'post')
-                    . Html::submitButton(
-                            'Logout (' . \Yii::$app->user->identity->email . ')', ['class' => 'btn btn-link']
-                    )
-                    . Html::endForm()
-                    . '</li>';
-        }
-
-        return $menuItems;
-    }
-
     public static function getMenuItems()
     {
         $output = [];

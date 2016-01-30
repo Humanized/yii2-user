@@ -109,7 +109,8 @@ class User extends ActiveRecord implements IdentityInterface {
         if (\Yii::$app->controller->module->params['enablePasswords']) {
             $this->appendPasswordRules($rules);
         }
-        if (\Yii::$app->controller->module->params['enableStatusCodes']) {
+        if ($this->_module->params['enableStatusCodes']) {
+    
             $rules[] = ['status', 'default', 'value' => \Yii::$app->controller->module->params['defaultStatusCode']];
             $rules[] = ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])];
         }
@@ -287,14 +288,35 @@ class User extends ActiveRecord implements IdentityInterface {
         $this->password_reset_token = null;
     }
 
+    /**
+     * Extra steps are taken in scenarios where user account password are handled.
+     * 
+     * 
+     * @return type
+     */
     public function beforeValidate()
     {
         if ($this->scenario == self::SCENARIO_ADMIN || $this->scenario == self::SCENARIO_SIGNUP) {
             $this->generateAuthKey();
             $this->_generatePassword();
         }
-
         return parent::beforeValidate();
+    }
+
+    /**
+     * Extra steps are taken in scenarios where user account password are handled
+     * 
+     * @return type
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($this->generatePassword) {
+            $model = new PasswordResetRequest(['email' => $this->email]);
+            if (!($model->validate() && $model->sendEmail())) {
+                return false;
+            }
+        }
+        return parent::afterSave($insert, $changedAttributes);
     }
 
     private function _generatePassword()
@@ -307,17 +329,6 @@ class User extends ActiveRecord implements IdentityInterface {
             $passwd = \Yii::$app->security->generateRandomString();
         }
         $this->setPassword($passwd);
-    }
-
-    public function afterSave($insert, $changedAttributes)
-    {
-        if ($this->generatePassword) {
-            $model = new PasswordResetRequest(['email' => $this->email]);
-            if (!($model->validate() && $model->sendEmail())) {
-                return false;
-            }
-        }
-        return parent::afterSave($insert, $changedAttributes);
     }
 
 }

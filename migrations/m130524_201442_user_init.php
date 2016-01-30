@@ -4,16 +4,16 @@ use yii\db\Migration;
 
 class m130524_201442_user_init extends Migration {
 
-    private $_module = NULL;
+    private $_params = NULL;
     private $_tableOptions = NULL;
 
     public function init()
     {
         parent::init();
 
-       
 
-        $this->_module = \Yii::$app->getModule('user');
+
+        $this->_params = \Yii::$app->getModule('user')->params;
 
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
@@ -23,39 +23,44 @@ class m130524_201442_user_init extends Migration {
 
     public function up()
     {
-        $userAttributes = [
+
+
+        $attribs = [
             'id' => $this->primaryKey(),
-            'auth_key' => $this->string(32)->notNull(),
+            'email' => $this->string()->notNull()->unique(),
             'password_hash' => $this->string()->notNull(),
             'password_reset_token' => $this->string()->unique(),
-            'email' => $this->string()->notNull()->unique(),
+            'auth_key' => $this->string(32)->notNull(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
         ];
-        if ($this->_module->params['enableUserName']) {
+        if ($this->_params['enableUserName']) {
             $attribs['username'] = $this->string()->notNull()->unique();
         }
-        if ($this->_module->params['enableTokenAuthentication']) {
+        if ($this->_params['enableTokenAuthentication']) {
             $attribs['auth_token'] = $this->string()->notNull();
         }
-        if ($this->_module->params['enableStatusCodes']) {
-            $attribs['status'] = $this->smallInteger()->notNull()->defaultValue($this->_module->params['defaultStatusCode']);
+        if ($this->_params['enableStatusCodes']) {
+
+            echo 'all good';
+            $attribs['status'] = $this->smallInteger()->notNull()->defaultValue($this->_params['defaultStatusCode']);
             if (!$this->_setupStatusCodeTable()) {
                 return FALSE;
             }
         }
-        $this->createTable('{{%user}}', $userAttributes, $this->_tableOptions);
-        if (isset($this->_module->params['statusCodeTable'])) {
-            $this->addForeignKey('fk_user_status', '{{%user}}', 'status', $this->_module->params['statusCodeTable'], 'id');
+        $this->createTable('{{%user}}', $attribs, $this->_tableOptions);
+
+        if (isset($this->_params['statusCodeTable'])) {
+            $this->addForeignKey('fk_user_status', '{{%user}}', 'status', $this->_params['statusCodeTable'], 'id');
         }
     }
 
     private function _setupStatusCodeTable()
     {
-        $statusTable = $this->_module->params['statusCodeTable'];
+        $statusTable = $this->_params['statusCodeTable'];
         if (isset($statusTable)) {
-            $status_id = $this->_module->params['statusCodeIdAttribute'];
-            $status_name = $this->_module->params['statusCodeNameAttribute'];
+            $status_id = $this->_params['statusCodeIdAttribute'];
+            $status_name = $this->_params['statusCodeNameAttribute'];
             if (!(isset($status_id) && isset($status_name))) {
                 return FALSE;
             }
