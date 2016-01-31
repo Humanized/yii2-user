@@ -56,6 +56,18 @@ class User extends ActiveRecord implements IdentityInterface {
      * @var string 
      */
     public $password_confirm;
+
+    /**
+     *
+     * @var array<string> List of user roles 
+     */
+    public $roles = [];
+
+    /**
+     * Current Module Instance
+     * 
+     * @var type 
+     */
     private $_module = NULL;
 
     /**
@@ -110,34 +122,35 @@ class User extends ActiveRecord implements IdentityInterface {
             $this->appendPasswordRules($rules);
         }
         if ($this->_module->params['enableStatusCodes']) {
-    
+
             $rules[] = ['status', 'default', 'value' => \Yii::$app->controller->module->params['defaultStatusCode']];
             $rules[] = ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])];
+        }
+        if ($this->_module->params['enableRBAC']) {
+            $rules[] = ['roles', 'each', 'rule' => ['range' => array_keys(\Yii::$app->authManager->getRoles())]];
         }
         return $rules;
     }
 
     public function appendPasswordRules(&$rules)
     {
+        $when = function($model) {
+            return !$model->generatePassword;
+        };
+        $whenClient = "function (attribute, value) {
+                                    return $('#generate-password').checked==false;
+                                }";
         $rules = array_merge($rules, [
             ['generatePassword', 'required', 'on' => [self::SCENARIO_ADMIN]],
             ['password', 'string', 'min' => 8],
             ['password', 'required',
-                'when' => function($model) {
-                    return !$model->generatePassword;
-                },
-                'whenClient' => "function (attribute, value) {
-                                    return $('#generate-password').checked==false;
-                                }"
+                'when' => $when,
+                'whenClient' => $whenClient
             ],
             ['password_confirm', 'required',
                 'on' => [self::SCENARIO_SIGNUP, self::SCENARIO_ADMIN],
-                'when' => function($model) {
-            return !$model->generatePassword;
-        },
-                'whenClient' => "function (attribute, value) {
-                                     return $('#generate-password').checked==false;
-                                }"
+                'when' => $when,
+                'whenClient' => $whenClient
             ],
             ['password_confirm', 'compare', 'compareAttribute' => 'password', 'message' => "Passwords don't match"],
         ]);

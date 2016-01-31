@@ -4,12 +4,14 @@ namespace humanized\user\controllers;
 
 use yii\web\Controller;
 use humanized\user\models\common\User;
+use humanized\user\models\common\AuthenticationToken;
 use humanized\user\models\common\PasswordResetRequest;
 use humanized\user\models\gui\LoginForm;
-use humanized\user\models\common\UserSearch;
 
 class AccountController extends Controller {
 
+    
+    
     /**
      * Logs in a user.
      *
@@ -118,12 +120,32 @@ class AccountController extends Controller {
 
     public function actionIndex($id)
     {
+
         $model = User::findOne(['id' => $id]);
-
-
         return $this->render('index', [
                     'model' => $model,
         ]);
+    }
+
+    public function actionTokens($id)
+    {
+        if (!\Yii::$app->controller->module->params['enableTokenAuthentication']) {
+            throw new \yii\web\NotFoundHttpException('Page not found.');
+        }
+        $model = new AuthenticationToken(['user_id' => $id]);
+        $dataProvider = $model->search($id);
+
+        return $this->render('token', [
+                    'model' => $model,
+                    'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionDeleteToken($id)
+    {
+        $token = AuthenticationToken::findOne($id);
+        $caller = $token->user_id;
+        $this->redirect(['index', 'id' => $caller]);
     }
 
     public function actionCreate()

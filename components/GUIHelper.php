@@ -16,6 +16,9 @@ class GUIHelper {
         if (NULL !== \Yii::$app->user->id) {
             $output[] = ['label' => 'My Profile', 'url' => ['/user/account/index', 'id' => \Yii::$app->user->getId()]];
         }
+        if (NULL !== \Yii::$app->user->id) {
+            $output[] = ['label' => 'My Authentication Tokens', 'visible' => \Yii::$app->controller->module->params['enableTokenAuthentication'], 'url' => ['/user/account/tokens', 'id' => \Yii::$app->user->getId()]];
+        }
         return $output;
     }
 
@@ -27,6 +30,18 @@ class GUIHelper {
     public static function getStatusList()
     {
         return \humanized\user\Module::getInstance()->params['statusCodes'];
+    }
+
+    /**
+     * Returns the list 
+     * 
+     * @return array<string>|null List of User Account Status Options or NULL when module is set to ignore this feature
+     */
+    public static function getRoleList()
+    {
+        return array_map(function($role) {
+            return $role->name;
+        }, \Yii::$app->authManager->getRoles());
     }
 
 }

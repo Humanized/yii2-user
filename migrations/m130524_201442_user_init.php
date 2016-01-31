@@ -37,12 +37,8 @@ class m130524_201442_user_init extends Migration {
         if ($this->_params['enableUserName']) {
             $attribs['username'] = $this->string()->notNull()->unique();
         }
-        if ($this->_params['enableTokenAuthentication']) {
-            $attribs['auth_token'] = $this->string()->notNull();
-        }
         if ($this->_params['enableStatusCodes']) {
 
-            echo 'all good';
             $attribs['status'] = $this->smallInteger()->notNull()->defaultValue($this->_params['defaultStatusCode']);
             if (!$this->_setupStatusCodeTable()) {
                 return FALSE;
@@ -50,9 +46,24 @@ class m130524_201442_user_init extends Migration {
         }
         $this->createTable('{{%user}}', $attribs, $this->_tableOptions);
 
+        if (isset($this->_params['enableTokenAuthentication'])) {
+            $this->_setupAuthenticationTokenTable();
+        }
+
         if (isset($this->_params['statusCodeTable'])) {
             $this->addForeignKey('fk_user_status', '{{%user}}', 'status', $this->_params['statusCodeTable'], 'id');
         }
+    }
+
+    private function _setupAuthenticationTokenTable()
+    {
+        $this->createTable('authentication_token', [
+            'id' => $this->primaryKey(),
+            'title' => $this->string(25)->notNull(),
+            'token' => $this->string()->unique()->notNull(),
+            'user_id' => $this->integer()->notNull()
+                ], $this->_tableOptions);
+        $this->addForeignKey('fk_authentication_token_user', 'authentication_token', 'user_id', '{{%user}}', 'id');
     }
 
     private function _setupStatusCodeTable()

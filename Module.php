@@ -21,13 +21,12 @@ namespace humanized\user;
  * 
  * CLI 
  * 
- * A CLI allowing basic Yii2 user administration functions.
+ * A CLI providing basic Yii2 user management facilties .
  * 
  * 
  * REST API
  * 
- * Under Construction - Due v0.5
- * 
+ * Under Construction
  * 
  * 
  * @name Yii2 User Administration Module Class 
@@ -60,7 +59,8 @@ class Module extends \yii\base\Module {
      * @since 0.1
      * @var boolean Enable access token authentication. 
      * 
-     * When enabled, authentication tokens can be generated used to authenticate accounts over passwords
+     * When enabled, authentication tokens can be generated used to authenticate accounts
+     * This enables access to external applications via API
      * 
      * Defaults to FALSE
      * 
@@ -148,15 +148,10 @@ class Module extends \yii\base\Module {
      * 
      * Following configuration options are supported:
      * 
-     * 
-     * 
-     * accessAdmin            Permission providing account complete user management administration access. (Default FALSE)
-     * 
-     * accessGroupAdmin       Permission providing account user management administration access for accounts lower-or-equal-to access level. (Default FALSE)
-     * 
-     * allowTokenGeneration   Permission providing account to generate an authentication token. 
-     *                        Only useful when enableTokenAuthentication-flag option is set. (Default TRUE)
-     * 
+     * <table>
+     * <tr><td><i>accessAdmin</i></td><td>Permission allowing account complete user management administration access. (Default FALSE)</td></tr>
+     * <tr><td><i>accessGroupAdmin</i></td><td>Permission allowing account user management administration access for accounts lower-or-equal-to access level. (Default FALSE)</td></tr>
+     * </table>
      *  
      */
     public $permissions = [
@@ -183,15 +178,17 @@ class Module extends \yii\base\Module {
     private $_isRoot = FALSE;
 
     /**
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
      * @since 0.1
      * @var boolean Enable role cased authorisation control
      * 
      * When enabled, several mechanisms are provided to incorporate user accounts with the default RBAC interface provided by the framework.
+     * These can be configured using the rbacSettings configuration array
      * 
      * Defaults to FALSE    
      */
     public $enableRBAC = FALSE;
-    public $rbacSettings = [];
+
 
     public function init()
     {
@@ -401,7 +398,7 @@ class Module extends \yii\base\Module {
                     break;
                 }
             default: {
-                    throw new \yii\base\InvalidConfigException('User Module #100: Provided accessAdmin permission in wrong datatype', 100);
+                    throw new \yii\base\InvalidConfigException('Yii2 User Module: Provided accessAdmin permission in wrong datatype', 100);
                 }
         }
         $this->params['permissions']['accessAdmin'] = $accessGranted;
@@ -410,7 +407,7 @@ class Module extends \yii\base\Module {
     private function _caseStringPermission(&$access, &$error)
     {
         if (!$this->params['enableRBAC']) {
-            throw new \yii\base\InvalidConfigException('User Module #802: enableRBAC should be set to true when using string-based variables for module permissions', 802);
+            throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);
         }
         $user = \Yii::$app->user;
         $permission = (string) $this->params['permissions']['accessAdmin'];

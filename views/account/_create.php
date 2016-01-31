@@ -18,6 +18,9 @@ if (\Yii::$app->controller->module->params['enableUserName']) {
 echo $form->field($model, 'email')->input('email');
 
 if ($model->scenario != \humanized\user\models\common\User::SCENARIO_SIGNUP) {
+    if (\Yii::$app->controller->module->params['enableRBAC']) {
+         echo $form->field($model, 'roles')->dropDownList(\humanized\user\components\GUIHelper::getRoleList(), ['prompt' => 'Select Role']);
+    }
     if (\Yii::$app->controller->module->params['enableStatusCodes']) {
         echo $form->field($model, 'status')->dropDownList(\humanized\user\components\GUIHelper::getStatusList(), ['prompt' => 'Select Status Value']);
     }
