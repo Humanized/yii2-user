@@ -12,13 +12,14 @@ class GUIHelper {
     public static function getMenuItems()
     {
         $output = [];
+        if (NULL !== \Yii::$app->user->id) {
+            $output[] = ['label' => 'Account', 'url' => ['/user/account/index', 'id' => \Yii::$app->user->getId()]];
+        }
+        if (NULL !== \Yii::$app->user->id) {
+            $output[] = ['label' => 'Authentication Tokens', 'visible' => \Yii::$app->controller->module->params['enableTokenAuthentication'], 'url' => ['/user/account/tokens', 'id' => \Yii::$app->user->getId()]];
+        }
+
         $output[] = ['label' => 'User Management', 'visible' => \Yii::$app->controller->module->params['permissions']['accessAdmin'], 'url' => ['/user/admin/index']];
-        if (NULL !== \Yii::$app->user->id) {
-            $output[] = ['label' => 'My Profile', 'url' => ['/user/account/index', 'id' => \Yii::$app->user->getId()]];
-        }
-        if (NULL !== \Yii::$app->user->id) {
-            $output[] = ['label' => 'My Authentication Tokens', 'visible' => \Yii::$app->controller->module->params['enableTokenAuthentication'], 'url' => ['/user/account/tokens', 'id' => \Yii::$app->user->getId()]];
-        }
         return $output;
     }
 

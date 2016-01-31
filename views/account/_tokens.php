@@ -19,7 +19,7 @@ $columns = array_merge([[
     }]
 // you may configure additional properties here
             ]]
-                , [ 'identifier','tokenMask']);
+                , [ 'label','tokenMask']);
 
         $config = [
             'dataProvider' => $dataProvider,

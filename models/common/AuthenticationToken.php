@@ -37,10 +37,9 @@ class AuthenticationToken extends ActiveRecord {
 
     public function beforeValidate()
     {
-        $this->token = \Yii::$app->security->generateRandomString();
+        $this->token = \Yii::$app->security->generateRandomString(100);
         $this->token_hash = \Yii::$app->security->generatePasswordHash($this->token);
+        return parent::beforeValidate();
     }
-    
-    
 
 }

@@ -2,8 +2,8 @@
 
 use yii\bootstrap\Html;
 
-$this->params['breadcrumbs'][] = 'User Administration';
-$this->params['breadcrumbs'][] = 'Accounts';
+$this->params['breadcrumbs'][] = 'Account';
+$this->params['breadcrumbs'][] = 'Authentication Tokens';
 ?>
 <div class = "row">
     <aside class = "col-md-4">
@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = 'Accounts';
         </div>
 
         <div class = "well">
-            <blockquote><span class = "glyphicon glyphicon-user"></span> Generate Token</blockquote>
+            <blockquote><span class = "glyphicon glyphicon-lock"></span> Generate Token</blockquote>
             <?=
             $this->render('_token_create', ['model' => $model]);
             ?>

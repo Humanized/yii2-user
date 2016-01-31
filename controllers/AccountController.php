@@ -130,14 +130,18 @@ class AccountController extends Controller {
             throw new \yii\web\NotFoundHttpException('Page not found.');
         }
 
-        $model = new AuthenticationToken(['user_id' => $id]);
+        $model = new AuthenticationToken([
+            'scenario' => AuthenticationToken::SCENARIO_TOKEN_GENERATION,
+            'user_id' => $id
+        ]);
+
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->save()) {
-                \Yii::$app->session->setFlash('success', "<strong>Token Generated Successfully (Copy it Now):<strong><br>" . $model->token);
+                \Yii::$app->session->setFlash('success', "<strong>Token Generated Successfully (Copy it Now):</strong><br>" . $model->token);
             } else {
-       //         \Yii::$app->session->setFlash('error', \Yii::$app->request->post());
+                //         \Yii::$app->session->setFlash('error', \Yii::$app->request->post());
             }
-            $model = new AuthenticationToken(['user_id' => $id]); //reset model
+            $model = new AuthenticationToken(['scenario' => AuthenticationToken::SCENARIO_TOKEN_GENERATION, 'user_id' => $id]); //reset model
         }
         $searchModel = new AuthenticationToken(['user_id' => $id]);
         $dataProvider = $searchModel->search($id);
@@ -156,7 +160,8 @@ class AccountController extends Controller {
         }
         $token = AuthenticationToken::findOne($id);
         $caller = $token->user_id;
-        $this->redirect(['index', 'id' => $caller]);
+        $token->delete();
+        $this->redirect(['tokens', 'id' => $caller]);
     }
 
     public function actionCreate()
