@@ -149,8 +149,8 @@ class Module extends \yii\base\Module {
      * Following configuration options are supported:
      * 
      * <table>
-     * <tr><td><i>accessAdmin</i></td><td>Permission allowing account complete user management administration access. (Default FALSE)</td></tr>
-     * <tr><td><i>accessGroupAdmin</i></td><td>Permission allowing account user management administration access for accounts lower-or-equal-to access level. (Default FALSE)</td></tr>
+     * <tr><td><i>user-administrator</i></td><td>Permission allowing account complete user management administration access. (Default FALSE)</td></tr>
+     * <tr><td><i>user-group-administrator</i></td><td>Permission allowing account user management administration access for accounts lower-or-equal-to access level. (Default FALSE)</td></tr>
      * </table>
      *  
      */
@@ -189,7 +189,19 @@ class Module extends \yii\base\Module {
      */
     public $enableRBAC = FALSE;
 
+    /**
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1
+     * @var array<string> List of actions when guest
+     */
+    private $_public = ['login', 'request-password-reset'];
 
+    /**
+     * Initialisation of module parameters
+     * Is run when loading configuration file
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1
+     */
     public function init()
     {
         parent::init();
@@ -201,9 +213,8 @@ class Module extends \yii\base\Module {
         $this->initGridOptions();
         $this->initStatusCodes();
 
-        //Permission Related initialisation (not available when CLI)
+//Permission Related initialisation (not available when CLI)
         if (php_sapi_name() != "cli" && !\Yii::$app->user->isGuest) {
-
             $this->initRoot();
         }
         $this->initPermission();
@@ -211,11 +222,11 @@ class Module extends \yii\base\Module {
 
     private function initIdentityModel()
     {
-        //Setting Default Identity class
+//Setting Default Identity class
         if (!isset($this->identityClass)) {
             $this->identityClass = \Yii::$app->user->identityClass;
         }
-        //Setting Method to find 
+//Setting Method to find 
         if (!isset($this->fnUser)) {
             $this->fnUser = "findByUsername";
         }
@@ -232,6 +243,9 @@ class Module extends \yii\base\Module {
         $this->params['enableUserVerification'] = $this->enableUserVerification;
         $this->params['enablePasswords'] = $this->enablePasswords;
         $this->params['enableSignUp'] = $this->enableSignUp;
+        if ($this->enableSignUp) {
+            $this->_public[] = 'sign-up';
+        }
     }
 
     private function initGridOptions()
@@ -248,65 +262,48 @@ class Module extends \yii\base\Module {
     private function initStatusCodes()
     {
         $this->params['enableStatusCodes'] = $this->enableStatusCodes;
-
         $this->params['statusCodeTable'] = $this->statusCodeTable;
         if (isset($this->statusCodeTable)) {
-            //Load DB values from provided table to the statuscodes variable 
+//Load DB values from provided table to the statuscodes variable 
         } elseif (empty($this->statusCodes)) {
-            //No Account Status Codes Provided, yet feature is enabled
-            //Fallback to stock-like functionality
+//No Account Status Codes Provided, yet feature is enabled
+//Fallback to stock-like functionality
             $this->params['statusCodes'] = [0 => 'INACTIVE', 10 => 'ACTIVE'];
         }
         $this->params['defaultStatusCode'] = $this->defaultStatusCode;
     }
 
     /**
-     * Parses the root parameter which is either   
+     * <p>Sets the internal is_root flag for a session, allowing overriding of module RBAC permission checks.</p>  
+     * <p>Relevant parameter is either single value or array
+     * Subsequently, a private function is called either on a single string value once or, in succession on multiple string values.</p>  
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1 
      */
     private function initRoot()
     {
-        if (is_array($this->root)) {
-            foreach ($this->root as $root) {
-                if ($this->_initRoot($root)) {
-                    $this->_isRoot = TRUE;
-                    break;
-                }
-            }
+        //CASE#1: setup parameter is a single value 
+        if (!is_array($this->root)) {
+            //Call private method returning a boolean type
+            $this->_isRoot = $this->_initRoot($this->root);
             return;
         }
-        $this->_isRoot = $this->_initRoot($this->root);
-    }
-
-    /**
-     * 
-     * @param type $root
-     * @return boolean
-     */
-    private function _initRoot($root)
-    {
-        $this->_validateRootInput($root);
-        $needle = \Yii::$app->user->identity->email;
-        $identity = $this->identityClass;
-
-        if (substr($root, 0, 1) == '*') {
-            $compare = new \yii\db\Expression(substr($root, 1));
-            $criteria = ['LIKE', 'email', "$compare"];
-            $users = $identity::find()->where($criteria)->asArray()->all();
-            return in_array($needle, array_map(function($t) {
-                        return $t['email'];
-                    }, $users));
-        } else {
-            $criteria = ['email' => $root];
-            $user = $identity::findOne($criteria);
-            if (isset($user)) {
-                return $user->email == $needle;
+        //CASE#2: setup parameter is an array
+        foreach ($this->root as $root) {
+            //Call private method returning a boolean type
+            if ($this->_initRoot($root)) {
+                //Break at first evaluation to true
+                $this->_isRoot = TRUE;
+                break;
             }
         }
-        return FALSE;
+        //When Foreach passes without break, flag remains set to default
+        return;
     }
 
     /**
-     * Validates input submitted to be an e-mail address 
+     * Validates e-mail input is submitted for assigning root access   
+     * Throws appropriate error on config validation error
      * 
      * @param string $root a root account defined by email address 
      * @throws \yii\base\InvalidConfigException
@@ -322,6 +319,36 @@ class Module extends \yii\base\Module {
     }
 
     /**
+     * Private boolean function that determines session root access 
+     * given user credentials and module configuration 
+     * @param type $root
+     * @return boolean
+     */
+    private function _initRoot($root)
+    {
+        $this->_validateRootInput($root);
+        $needle = \Yii::$app->user->identity->email;
+        $identity = $this->identityClass;
+        //CASE #1: Bulk root assignment based on email suffix
+        if (substr($root, 0, 1) == '*') {
+            $compare = new \yii\db\Expression(substr($root, 1));
+            $criteria = ['LIKE', 'email', "$compare"];
+            $users = $identity::find()->where($criteria)->asArray()->all();
+            return in_array($needle, array_map(function($t) {
+                        return $t['email'];
+                    }, $users));
+        }
+        //CASE #2: Single account entry
+        $criteria = ['email' => $root];
+        $user = $identity::findOne($criteria);
+        if (isset($user)) {
+            return $user->email == $needle;
+        }
+        //ELSE: Return FALSE (no root access)
+        return FALSE;
+    }
+
+    /**
      * Run after initRBAC method
      */
     private function initPermission()
@@ -329,11 +356,8 @@ class Module extends \yii\base\Module {
         $this->params['enableRBAC'] = $this->enableRBAC;
         //Default Values
         $permissions = [
-            'accessAdmin' => $this->_isRoot ? TRUE : FALSE,
-            'assignStatus' => $this->_isRoot ? TRUE : FALSE,
-            'assignRole' => $this->_isRoot ? TRUE : FALSE,
-            'assignGroupRole' => $this->_isRoot ? TRUE : FALSE,
-            'generateToken' => $this->_isRoot ? TRUE : TRUE,
+            'user-administrator' => $this->_isRoot ? TRUE : FALSE,
+            'user-group-administrator' => $this->_isRoot ? TRUE : FALSE,
         ];
         //Overwrite default values with RBAC permissions when not root
         if (!$this->_isRoot) {
@@ -345,66 +369,129 @@ class Module extends \yii\base\Module {
         $this->params['permissions'] = $permissions;
     }
 
+    /**
+     * Global Module beforeActions
+     * Defines controller access permission based on module configuration
+     * 
+     * 
+     * @param type $action
+     * @return type
+     * @throws \yii\web\NotFoundHttpException
+     */
     public function beforeAction($action)
     {
-        $accessGranted = TRUE;
+
+
+        //Access Granted By Default
+        //Default Error Message
         $error = 'Page not found.';
+
+        //CASE #1: Public Access (Guest Access)
+        if (\Yii::$app->user->isGuest) {
+            if (in_array($action->id, $this->_public)) {
+                return parent::beforeAction($action);
+            } else {
+                throw new \yii\web\NotFoundHttpException($error);
+            }
+        }
+        //CASE #2: Configurable Interfaces
+        if (($action->id == 'tokens' || ($action->id == 'delete-token')) && !$this->params['enableTokenAuthentication']) {
+            throw new \yii\web\NotFoundHttpException($error);
+        }
+
+        //CASE #3: Permission-based Access
         if (!$this->_isRoot) {
-            $this->_checkProtected($action, $accessGranted, $error);
+            //Not Root Access, so see if particular 
+            $accessGranted = $this->_checkPrivilege($action);
             if (!$accessGranted) {
                 throw new \yii\web\NotFoundHttpException($error);
             }
         }
-        return $accessGranted && parent::beforeAction($action);
+        return parent::beforeAction($action);
     }
 
-    private function _checkProtected($action, &$accessGranted, &$error)
+    /**
+     * 
+     * Is called when session has a logged-in users
+     * @param type $action
+     */
+    private function _checkPrivilege($action)
     {
-        $adminAccess = NULL;
-        $this->_checkAdminAccess($adminAccess, $error);
+        $grantAccess = $this->_switchPermission('user-administrator');
 
-        if ($action->id == 'index') {
-            if (\Yii::$app->user->isGuest) {
-                throw new \yii\web\NotFoundHttpException($error);
-            }
-            if (\Yii::$app->controller->id == 'admin') {
-                $accessGranted = $adminAccess;
-            }
+        switch (\Yii::$app->controller->id) {
+            case 'account': {
+
+                    break;
+                }
+
+            case 'admin': {
+                    $grantAccess = $this->_switchPermission('user-group-administrator');
+                }
         }
+        return $grantAccess;
     }
 
-    private function _checkAdminAccess(&$accessGranted, &$error)
+    private function _checkAccountPrivilege($action)
     {
-        $this->_switchPermission($accessGranted, $error);
-        if (!isset($accessGranted)) {
-            throw new \yii\web\BadRequestHttpException($error);
+        $grantAccess = FALSE;
+        switch ($action->id) {
+            case 'index' || 'tokens' || 'delete-token' || 'request-password-reset': {
+                    $grantAccess = $this->_validateAccountParameters($action->id);
+                    break;
+                }
+            case 'logout': {
+                    $grantAccess = TRUE;
+                    break;
+                }
         }
+        return $grantAccess;
     }
 
-    private function _switchPermission(&$accessGranted, &$error)
+    private function _validateAccountParameters($action)
     {
-        $accessAdmin = $this->params['permissions']['accessAdmin'];
-        switch (gettype($accessAdmin)) {
+        $id = \yii::$app->getRequest()->getQueryParams()['id'];
+        $userId = \Yii::$app->user->id;
+        if (!isset($id)) {
+            return FALSE;
+        }
+        //User ID parameter is set and matches current session account-idF
+        if ($action != 'delete-token') {
+            return $userId == $id;
+        }
+        //delete token
+        $token = models\common\AuthenticationToken::findOne(['id' => $id]);
+        if (isset($token)) {
+            return $token->user_id == $userId;
+        }
+        return FALSE;
+    }
+
+    private function _switchPermission($permission)
+    {
+        $grantAccess = FALSE;
+        $p = $this->params['permissions'][$permission];
+        switch (gettype($p)) {
             case "boolean": {
-                    $accessGranted = $accessAdmin;
+                    $grantAccess = $p;
                     break;
                 }
             case "string": {
-                    $this->_caseStringPermission($accessGranted, $error);
+                    $grantAccess = $this->_caseStringPermission($p);
                     break;
                 }
             case "array": {
-                    $accessGranted = NULL;
+                    $grantAccess = NULL;
                     break;
                 }
             default: {
                     throw new \yii\base\InvalidConfigException('Yii2 User Module: Provided accessAdmin permission in wrong datatype', 100);
                 }
         }
-        $this->params['permissions']['accessAdmin'] = $accessGranted;
+        return $grantAccess;
     }
 
-    private function _caseStringPermission(&$access, &$error)
+    private function _caseStringPermission(&$acces)
     {
         if (!$this->params['enableRBAC']) {
             throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);

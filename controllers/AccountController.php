@@ -8,27 +8,16 @@ use humanized\user\models\common\AuthenticationToken;
 use humanized\user\models\common\PasswordResetRequest;
 use humanized\user\models\gui\LoginForm;
 
+/**
+ * 
+ */
 class AccountController extends Controller {
-
     /**
-     * Logs in a user.
-     *
-     * @return mixed
+     * =========================================================================
+     *                              Protected Actions 
+     *              Actions subject to module permission configuration
+     * =========================================================================
      */
-    public function actionLogin()
-    {
-        if (!\Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-        $model = new LoginForm();
-        if ($model->load(\Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        } else {
-            return $this->render('login', [
-                        'model' => $model,
-            ]);
-        }
-    }
 
     /**
      * Logs out the current user.
@@ -38,33 +27,7 @@ class AccountController extends Controller {
     public function actionLogout()
     {
         \Yii::$app->user->logout();
-
         return $this->goHome();
-    }
-
-    /**
-     * Signs user up.
-     *
-     * @return mixed
-     */
-    public function actionSignup()
-    {
-        if (!\Yii::$app->controller->module->params['enableSignUp']) {
-            throw new \yii\web\NotFoundHttpException('Page not found.');
-        }
-        $model = new User();
-        $model->scenario = 'signup';
-        $model->generatePassword = FALSE;
-        if ($model->load(\Yii::$app->request->post())) {
-            if ($model->save()) {
-                if (\Yii::$app->getUser()->login($model)) {
-                    return $this->goHome();
-                }
-            }
-        }
-        return $this->render('signup', [
-                    'model' => $model,
-        ]);
     }
 
     /**
@@ -115,6 +78,12 @@ class AccountController extends Controller {
         ]);
     }
 
+    /**
+     * User Account Interface
+     * 
+     * @param type $id
+     * @return type
+     */
     public function actionIndex($id)
     {
 
@@ -124,6 +93,13 @@ class AccountController extends Controller {
         ]);
     }
 
+    /**
+     * User Authentication Token Interface
+     * 
+     * @param type $id
+     * @return type
+     * @throws \yii\web\NotFoundHttpException
+     */
     public function actionTokens($id)
     {
         if (!\Yii::$app->controller->module->params['enableTokenAuthentication']) {
@@ -138,8 +114,6 @@ class AccountController extends Controller {
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->save()) {
                 \Yii::$app->session->setFlash('success', "<strong>Token Generated Successfully (Copy it Now):</strong><br>" . $model->token);
-            } else {
-                //         \Yii::$app->session->setFlash('error', \Yii::$app->request->post());
             }
             $model = new AuthenticationToken(['scenario' => AuthenticationToken::SCENARIO_TOKEN_GENERATION, 'user_id' => $id]); //reset model
         }
@@ -164,24 +138,51 @@ class AccountController extends Controller {
         $this->redirect(['tokens', 'id' => $caller]);
     }
 
-    public function actionCreate()
+    /**
+     * =========================================================================
+     *                              Public Actions 
+     *                      Actions can be performed by guests
+     * =========================================================================
+     */
+
+    /**
+     * 
+     * Logs in a user
+     * @return mixed
+     */
+    public function actionLogin()
     {
-        
+        $model = new LoginForm();
+        if ($model->load(\Yii::$app->request->post()) && $model->login()) {
+            return $this->goBack();
+        } else {
+            return $this->render('login', [
+                        'model' => $model,
+            ]);
+        }
     }
 
-    public function actionUpdate($id)
+    /**
+     * Signs user up.
+     *
+     * @return mixed
+     */
+    public function actionSignup()
     {
-        
-    }
-
-    public function actionView($id)
-    {
-        
-    }
-
-    public function actionDelete($id)
-    {
-        
+        if (!\Yii::$app->controller->module->params['enableSignUp']) {
+            throw new \yii\web\NotFoundHttpException('Page not found.');
+        }
+        $model = new User();
+        $model->scenario = 'signup';
+        $model->generatePassword = FALSE;
+        if ($model->load(\Yii::$app->request->post())) {
+            if ($model->save() && \Yii::$app->getUser()->login($model)) {
+                return $this->goHome();
+            }
+        }
+        return $this->render('signup', [
+                    'model' => $model,
+        ]);
     }
 
 }
