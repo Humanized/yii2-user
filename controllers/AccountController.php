@@ -10,8 +10,6 @@ use humanized\user\models\gui\LoginForm;
 
 class AccountController extends Controller {
 
-    
-    
     /**
      * Logs in a user.
      *
@@ -22,7 +20,6 @@ class AccountController extends Controller {
         if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
-
         $model = new LoginForm();
         if ($model->load(\Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
@@ -132,17 +129,31 @@ class AccountController extends Controller {
         if (!\Yii::$app->controller->module->params['enableTokenAuthentication']) {
             throw new \yii\web\NotFoundHttpException('Page not found.');
         }
+
         $model = new AuthenticationToken(['user_id' => $id]);
-        $dataProvider = $model->search($id);
+        if ($model->load(\Yii::$app->request->post())) {
+            if ($model->save()) {
+                \Yii::$app->session->setFlash('success', "<strong>Token Generated Successfully (Copy it Now):<strong><br>" . $model->token);
+            } else {
+       //         \Yii::$app->session->setFlash('error', \Yii::$app->request->post());
+            }
+            $model = new AuthenticationToken(['user_id' => $id]); //reset model
+        }
+        $searchModel = new AuthenticationToken(['user_id' => $id]);
+        $dataProvider = $searchModel->search($id);
 
         return $this->render('token', [
                     'model' => $model,
+                    'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
         ]);
     }
 
     public function actionDeleteToken($id)
     {
+        if (!\Yii::$app->controller->module->params['enableTokenAuthentication']) {
+            throw new \yii\web\NotFoundHttpException('Page not found.');
+        }
         $token = AuthenticationToken::findOne($id);
         $caller = $token->user_id;
         $this->redirect(['index', 'id' => $caller]);

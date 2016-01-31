@@ -12,7 +12,7 @@ $form = ActiveForm::begin([
             ],
         ]);
 
-echo $form->field($model, 'identifier');
+echo $form->field($model, 'label');
 
 
 

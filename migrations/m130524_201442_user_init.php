@@ -59,8 +59,8 @@ class m130524_201442_user_init extends Migration {
     {
         $this->createTable('authentication_token', [
             'id' => $this->primaryKey(),
-            'title' => $this->string(25)->notNull(),
-            'token' => $this->string()->unique()->notNull(),
+            'label' => $this->string(25)->notNull(),
+            'token_hash' => $this->string()->unique()->notNull(),
             'user_id' => $this->integer()->notNull()
                 ], $this->_tableOptions);
         $this->addForeignKey('fk_authentication_token_user', 'authentication_token', 'user_id', '{{%user}}', 'id');
