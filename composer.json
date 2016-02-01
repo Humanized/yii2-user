@@ -24,6 +24,7 @@
     ],
     "require": {
         "yiisoft/yii2": "@dev",
+        "kartik-v/yii2-widget-select2": "2.0.7",
         "humanized/yii2-clihelpers": "@dev"
     },
     "autoload": {
