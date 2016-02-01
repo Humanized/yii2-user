@@ -13,26 +13,29 @@ class AdminController extends Controller {
     /**
      * =========================================================================
      *                              Protected Actions 
-     *              Actions subject to module permission configuration
+     *        Actions subject to module permission configuration (all actually)
      * =========================================================================
      */
 
     /**
-     * 
+     * User Administration Dashboard
+     * Module permission check requires either user-admin or user-group-admin
+     * priviliges to continue.
      * @return mixed
      */
     public function actionIndex()
     {
-        //Account Creation Model
+        //Account Creation Model (admin scenario)
         $model = new User(['scenario' => User::SCENARIO_ADMIN]);
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            $model = new User(['scenario' => User::SCENARIO_ADMIN]); //reset model
+            //reset model on success
+            $model = new User(['scenario' => User::SCENARIO_ADMIN]);
         }
         //Account Search Model
         $searchModel = new UserSearch();
         $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
 
-        //
+        //Render index view file
         return $this->render('index', [
                     'model' => $model,
                     'searchModel' => $searchModel,
@@ -41,7 +44,10 @@ class AdminController extends Controller {
     }
 
     /**
-     * 
+     * User Account Deletion
+     * Module permission check requires either user-admin or user-group-admin
+     * priviliges to continue.
+     * @return mixed
      * @param type $id
      * @return type
      */
