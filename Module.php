@@ -12,22 +12,7 @@ namespace humanized\user;
  * This allows using the module (with it's default settings) to be used as a drop-in replacement for default user managment,
  * without having to worry about breaking code existing code (other than namespace renaming).   
  * 
- *  
- * 
- * GUI
- * 
- * Default user-management  provided by the system
- * 
- * 
- * CLI 
- * 
- * A CLI providing basic Yii2 user management facilties .
- * 
- * 
- * REST API
- * 
- * Under Construction
- * 
+ *   
  * 
  * @name Yii2 User Administration Module Class 
  * @version 0.1 
@@ -91,7 +76,7 @@ class Module extends \yii\base\Module {
 
     /**
      * @todo Implement this option
-     * @var boolean Enable verification of public account creation by system administrators. 
+     * @var boolean Enable user verification of public account creation through email
      * 
      * When enabled, account creation must be confirmed through the user management facilities provided by the module
      * 
@@ -102,9 +87,9 @@ class Module extends \yii\base\Module {
 
     /**
      * @todo Implement this feature
-     * @var boolean Enable password-based login. 
+     * @var boolean Enable administrator verification of public account creation
      * 
-     * When enabled, users are required to provide a password when logging in to the system 
+     * When enabled, administrators require to confirm user registration through the administrator dashboard  
      * 
      * Defaults to TRUE
      * 
@@ -188,6 +173,7 @@ class Module extends \yii\base\Module {
      * Defaults to FALSE    
      */
     public $enableRBAC = FALSE;
+    public $enableRBACInterface = FALSE;
 
     /**
      * @author Jeffrey Geyssens <jeffrey@humanized.be>
@@ -213,20 +199,26 @@ class Module extends \yii\base\Module {
         $this->initGridOptions();
         $this->initStatusCodes();
 
-//Permission Related initialisation (not available when CLI)
+        //Permission Related initialisation (not available when CLI)
         if (php_sapi_name() != "cli" && !\Yii::$app->user->isGuest) {
             $this->initRoot();
         }
         $this->initPermission();
     }
 
+    /**
+     * Initialisation of internal reference to identityclass
+     * 
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1 
+     */
     private function initIdentityModel()
     {
-//Setting Default Identity class
+        //Setting Default Identity class
         if (!isset($this->identityClass)) {
             $this->identityClass = \Yii::$app->user->identityClass;
         }
-//Setting Method to find 
+        //Setting Method to find 
         if (!isset($this->fnUser)) {
             $this->fnUser = "findByUsername";
         }
@@ -235,6 +227,12 @@ class Module extends \yii\base\Module {
         $this->params['fnUser'] = $this->fnUser;
     }
 
+    /**
+     * Initialisation of global module options
+     *  
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1
+     */
     private function initModuleOptions()
     {
         $this->params['enableTokenAuthentication'] = $this->enableTokenAuthentication;
@@ -248,6 +246,13 @@ class Module extends \yii\base\Module {
         }
     }
 
+    /**
+     * Initialisation of grid options
+     * 
+     * @todo Create Dashboard widget and allow setup options override
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1
+     */
     private function initGridOptions()
     {
         $this->params['enablePjax'] = $this->enablePjax;
@@ -256,18 +261,21 @@ class Module extends \yii\base\Module {
     }
 
     /**
+     * Initialisation of status code mechanism
      * 
      * @todo Database Status Code Storage
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1
      */
     private function initStatusCodes()
     {
         $this->params['enableStatusCodes'] = $this->enableStatusCodes;
         $this->params['statusCodeTable'] = $this->statusCodeTable;
         if (isset($this->statusCodeTable)) {
-//Load DB values from provided table to the statuscodes variable 
+            //Load DB values from provided table to the statuscodes variable 
         } elseif (empty($this->statusCodes)) {
-//No Account Status Codes Provided, yet feature is enabled
-//Fallback to stock-like functionality
+            //No Account Status Codes Provided, yet feature is enabled
+            //Fallback to stock-like functionality
             $this->params['statusCodes'] = [0 => 'INACTIVE', 10 => 'ACTIVE'];
         }
         $this->params['defaultStatusCode'] = $this->defaultStatusCode;
