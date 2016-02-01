@@ -17,7 +17,7 @@ Essentially, this module can functionally achieve the same as provided by the ad
 
 Other than providing the stock functionality, a lot has been made configurable:
 - Email-based login by default, over storage of a username/email combination
-- Graceful handling of account status codesS 
+- Graceful handling of (optional) account status codes
 
 A next goal deals with the implementation of some missing core user account functionality:
 
