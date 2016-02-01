@@ -8,6 +8,10 @@ Provides various interfaces to deal with routine user management tasks.
 
 > This module should be considered highly unstable and it's use is discouraged until further notice (really)
 
+
+> Version 0.1 Release notes: 
+
+
 ## Features
 
 This module aims to be a clean, modular and simple user-administration module which can be used for Yii 2 projects version 2.0.7 and up.
@@ -16,8 +20,9 @@ A first goal is to wrap the user management functionalities provided by the yii2
 Essentially, this module can functionally achieve the same as provided by the advanced template, with little to no changes made to the interface provided and minor changes to made layout.
 
 Other than providing the stock functionality, a lot has been made configurable:
-- Email-based login by default, over storage of a username/email combination
-- Graceful handling of (optional) account status codes
+- Email-based login by default, over storage of a username/email combination;
+- Enable/Disable guest signup;
+- Graceful handling of (optional) account status codes;
 
 A next goal deals with the implementation of some missing core user account functionality:
 
@@ -25,7 +30,13 @@ A next goal deals with the implementation of some missing core user account func
 - Token Based Authentication
 - RBAC Integration  
 
-Functionality will be added to this module, as we require  it for commercial use. 
+Functionality will be added to this module, as it becomes required for incorporation in further projects. We accept pull-requests! 
+
+The following functionality is due expected due in further versions:
+
+- PhpCAS Integration (due version 0.2)
+- OAuth Integration (due version 0.3)
+- REST API (due version 0.4)
 
 ## Installation
 
