@@ -4,7 +4,7 @@
 Provides various interfaces to deal with routine user management tasks.
 
 > This extension is under heavy development and requires the use of Yii framework version 2.0.7
-> This version of the framework is currently in-active development  
+> This version of the framework is currently in active development  
 
 > This module should be considered highly unstable and it's use is discouraged until further notice (really)
 
@@ -16,8 +16,8 @@ A first goal is to wrap the user management functionalities provided by the yii2
 Essentially, this module can functionally achieve the same as provided by the advanced template, with little to no changes made to the interface provided and minor changes to made layout.
 
 Other than providing the stock functionality, a lot has been made configurable:
-- email-login by default, over storage of a username/email combination
-- graceful status handling 
+- Email-based login by default, over storage of a username/email combination
+- Graceful handling of account status codesS 
 
 A next goal deals with the implementation of some missing core user account functionality:
 
@@ -25,7 +25,7 @@ A next goal deals with the implementation of some missing core user account func
 - Token Based Authentication
 - RBAC Integration  
 
-Functionality will be added to this module, as we require  it for commercial use.  
+Functionality will be added to this module, as we require  it for commercial use. 
 
 ## Installation
 
