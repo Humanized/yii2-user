@@ -14,7 +14,18 @@ This module aims to be a clean, modular and simple user-administration module wh
 
 A first goal is to wrap the user management functionalities provided by the yii2-advanced template to allow easy porting to other templates, such as the yii2-basic-template.
 Essentially, this module can functionally achieve the same as provided by the advanced template, with little to no changes made to the interface provided and minor changes to made layout.
- 
+
+Other than providing the stock functionality, a lot has been made configurable:
+- email-login by default, over storage of a username/email combination
+- graceful status handling 
+
+A next goal deals with the implementation of some missing core user account functionality:
+
+- Account Confirmation
+- Token Based Authentication
+- RBAC Integration  
+
+Functionality will be added to this module, as we require  it for commercial use.  
 
 ## Installation
 
