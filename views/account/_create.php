@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
 
 //$form = ActiveForm::begin(); //Default Active Form begin
 $form = ActiveForm::begin([
@@ -19,7 +20,17 @@ echo $form->field($model, 'email')->input('email');
 
 if ($model->scenario != \humanized\user\models\common\User::SCENARIO_SIGNUP) {
     if (\Yii::$app->controller->module->params['enableRBAC']) {
-         echo $form->field($model, 'roles')->dropDownList(\humanized\user\components\GUIHelper::getRoleList(), ['prompt' => 'Select Role']);
+        echo $form->field($model, 'roles')->widget(Select2::classname(), [
+            'data' => array_map(function($r) {
+                        return $r->name;
+                    }, \Yii::$app->authManager->getRoles()),
+            'language' => Yii::$app->language,
+            'options' => ['placeholder' => 'Select Roles ...', 'multiple' => true],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+        ;
     }
     if (\Yii::$app->controller->module->params['enableStatusCodes']) {
         echo $form->field($model, 'status')->dropDownList(\humanized\user\components\GUIHelper::getStatusList(), ['prompt' => 'Select Status Value']);
