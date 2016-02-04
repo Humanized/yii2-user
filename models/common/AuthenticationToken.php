@@ -38,8 +38,16 @@ class AuthenticationToken extends ActiveRecord {
     public function beforeValidate()
     {
         $this->token = \Yii::$app->security->generateRandomString(100);
-        $this->token_hash = \Yii::$app->security->generatePasswordHash($this->token);
+        $this->token_hash = $this->token;
         return parent::beforeValidate();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
 }

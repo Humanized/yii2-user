@@ -4,6 +4,7 @@ namespace humanized\user\models\common;
 
 use Yii;
 use humanized\user\models\common\PasswordResetRequest;
+use humanized\user\models\common\AuthenticationToken;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -177,7 +178,9 @@ class User extends ActiveRecord implements IdentityInterface {
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        $model = AuthenticationToken::findOne(['token_hash' => $token]);
+
+        return isset($model) ? $model->user : NULL;
     }
 
     /**
