@@ -89,9 +89,10 @@ class Module extends \yii\base\Module {
      * @todo Implement this feature
      * @var boolean Enable administrator verification of public account creation
      * 
-     * When enabled, administrators require to confirm user registration through the administrator dashboard  
+     * When enabled, administrators require to confirm user registration through the administrator dashboard.
+     *  
      * 
-     * Defaults to TRUE
+     * Defaults to FALSE
      * 
      */
     public $enablePasswords = TRUE;
@@ -153,7 +154,7 @@ class Module extends \yii\base\Module {
      * *@domain.it provides root access to all accounts registered in the system having an e-mail addressess ending with "@domain.it"
      * 
      */
-    public $root = ['*@humanized.be'];
+    public $root = ['*@domain.it'];
 
     /**
      *
@@ -185,6 +186,7 @@ class Module extends \yii\base\Module {
     /**
      * Initialisation of module parameters
      * Is run when loading configuration file
+     * 
      * @author Jeffrey Geyssens <jeffrey@humanized.be>
      * @since 0.1
      */
@@ -362,10 +364,9 @@ class Module extends \yii\base\Module {
     private function initPermission()
     {
         $this->params['enableRBAC'] = $this->enableRBAC;
-        //Default Values
+        //Setup defaults
         $permissions = [
-            'user-administrator' => $this->_isRoot ? TRUE : FALSE,
-            'user-group-administrator' => $this->_isRoot ? TRUE : FALSE,
+            'update-status' => $this->_isRoot ? TRUE : FALSE,
         ];
         //Overwrite default values with RBAC permissions when not root
         if (!$this->_isRoot) {
@@ -463,7 +464,8 @@ class Module extends \yii\base\Module {
         if (!isset($id)) {
             return FALSE;
         }
-        //User ID parameter is set and matches current session account-idF
+        //User ID parameter is set and matches current session account-id
+        //Only users can delete their own tokens (for now)
         if ($action != 'delete-token') {
             return $userId == $id;
         }
@@ -499,7 +501,7 @@ class Module extends \yii\base\Module {
         return $grantAccess;
     }
 
-    private function _caseStringPermission(&$acces)
+    private function _caseStringPermission(&$access)
     {
         if (!$this->params['enableRBAC']) {
             throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);

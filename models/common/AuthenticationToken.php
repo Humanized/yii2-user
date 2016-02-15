@@ -26,7 +26,7 @@ class AuthenticationToken extends ActiveRecord {
     public function search()
     {
         $query = new \yii\db\Query;
-        $maskExp = new \yii\db\Expression("'***************************************************'");
+        $maskExp = new \yii\db\Expression("'****************************************************************************************'");
         $query->select(['id' => 'id', 'label' => 'label', 'tokenMask' => $maskExp]);
         $query->from = ['authentication_token'];
         $query->where(['user_id' => $this->user_id]);

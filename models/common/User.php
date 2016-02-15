@@ -124,7 +124,7 @@ class User extends ActiveRecord implements IdentityInterface {
         }
         if ($this->_module->params['enableStatusCodes']) {
 
-            $rules[] = ['status', 'default', 'value' => \Yii::$app->controller->module->params['defaultStatusCode']];
+            $rules[] = ['status', 'default', 'value' => ($this->_module->params['enableUserVerification'] || $this->_module->params['enableAdminVerification']) ? self::STATUS_ACTIVE : self::STATUS_INACTIVE];
             $rules[] = ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])];
         }
         if ($this->_module->params['enableRBAC']) {
@@ -198,8 +198,8 @@ class User extends ActiveRecord implements IdentityInterface {
         if (!\humanized\user\Module::getInstance()->params['enableUserName'] && !$isEmail) {
             return NULL;
         }
-        echo'ta';
-        var_dump([($isEmail ? 'email' : 'username') => $username]);
+
+        //    var_dump([($isEmail ? 'email' : 'username') => $username]);
         return static::findOne([($isEmail ? 'email' : 'username') => $username]);
     }
 
@@ -325,16 +325,21 @@ class User extends ActiveRecord implements IdentityInterface {
     /**
      * Extra steps are taken in scenarios where user account password are handled
      * 
+     * 
      * @return type
      */
     public function afterSave($insert, $changedAttributes)
     {
-        if ($this->generatePassword) {
+        $cond1 = $this->generatePassword && !$this->_module->params['enableAdminVerification'];
+        $cond2 = isset($changedAttributes['status']) && $this->status != 0;
+        if ($cond1 || $cond2) {
             $model = new PasswordResetRequest(['email' => $this->email]);
             if (!($model->validate() && $model->sendEmail())) {
                 return false;
             }
         }
+
+
         return parent::afterSave($insert, $changedAttributes);
     }
 

@@ -174,7 +174,13 @@ class AccountController extends Controller {
         }
         $model = new User();
         $model->scenario = 'signup';
-        $model->generatePassword = FALSE;
+        if (!\Yii::$app->controller->module->params['enableStatusCodes'] && !\Yii::$app->controller->module->params['enableUserVerification']) {
+            $model->generatePassword = FALSE;
+            if (\Yii::$app->controller->module->params['enableAdminVerification']) {
+                $model->status = 0;
+            }
+        }
+
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->save() && \Yii::$app->getUser()->login($model)) {
                 return $this->goHome();
