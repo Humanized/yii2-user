@@ -1,4 +1,4 @@
-<?php
+<?php  
 
 namespace humanized\user\models\common;
 
