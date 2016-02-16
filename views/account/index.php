@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = 'Accounts';
             ]),
         ]);
 
-        if (\Yii::$app->controller->module->params['enableStatusCodes'] && Yii::$app->controller->module->params['permissions']['verify.account']) {
+        if ($model->id != \Yii::$app->user->id && \Yii::$app->controller->module->params['enableStatusCodes'] && Yii::$app->controller->module->params['permissions']['verify.account']) {
 
 
             echo Html::a(($model->status == 0 ? 'Enable' : 'Disable') . ' Account', ['admin/verify', 'id' => $model->id, 'alt' => TRUE], ['class' => 'btn btn-' . ($model->status == 0 ? 'success' : 'danger')]);
