@@ -135,8 +135,11 @@ class Module extends \yii\base\Module {
      * Following configuration options are supported:
      * 
      * <table>
-     * <tr><td><i>user-administrator</i></td><td>Permission allowing account complete user management administration access. (Default FALSE)</td></tr>
-     * <tr><td><i>user-group-administrator</i></td><td>Permission allowing account user management administration access for accounts lower-or-equal-to access level. (Default FALSE)</td></tr>
+     * 
+     * <tr><td><i>access.dashboard</i></td><td>Permission allowing access to the user management dashboard. Default FALSE</td></tr>
+     * <tr><td><i>create.account</i></td><td>Permission allowing creation of user accounts. Allows assigning users with role equal than or lower than administrator role undertaking the action. Default FALSE</td></tr>
+     * <tr><td><i>delete.account</i></td><td>Permission allowing deletion of user accounts. Default FALSE</td></tr>
+     * <tr><td><i>verify.account</i></td><td>Permission allowing verification of user accounts. Useful when the enableAdminVerification flag is set to TRUE. Default FALSE</td></tr>
      * </table>
      *  
      */
@@ -366,7 +369,10 @@ class Module extends \yii\base\Module {
         $this->params['enableRBAC'] = $this->enableRBAC;
         //Setup defaults
         $permissions = [
-            'update-status' => $this->_isRoot ? TRUE : FALSE,
+            'access.dashboard' => $this->_isRoot ? TRUE : FALSE,
+            'create.account' => $this->_isRoot ? TRUE : FALSE,
+            'delete.account' => $this->_isRoot ? TRUE : FALSE,
+            'verify.account' => $this->_isRoot ? TRUE : FALSE,
         ];
         //Overwrite default values with RBAC permissions when not root
         if (!$this->_isRoot) {
@@ -426,19 +432,33 @@ class Module extends \yii\base\Module {
      */
     private function _checkPrivilege($action)
     {
-        $grantAccess = $this->_switchPermission('user-administrator');
-
+        $access = NULL;
         switch (\Yii::$app->controller->id) {
             case 'account': {
+                    $access = $this->_checkAccountPrivilege($action);
+                    break;
+                }
+
+            case ('admin' && $action->id == 'index'): {
+
 
                     break;
                 }
 
-            case 'admin': {
-                    $grantAccess = $this->_switchPermission('user-group-administrator');
+            case ('admin' && $action->id == 'delete'): {
+
+
+                    break;
+                }
+            //TODO: implement this action to segregate 
+            case ('admin' && $action->id == 'create'): {
+
+
+                    break;
                 }
         }
-        return $grantAccess;
+
+        return $access;
     }
 
     private function _checkAccountPrivilege($action)
@@ -487,7 +507,7 @@ class Module extends \yii\base\Module {
                     break;
                 }
             case "string": {
-                    $grantAccess = $this->_caseStringPermission($p);
+                    $grantAccess = $this->_caseRBAC($p);
                     break;
                 }
             case "array": {
@@ -495,21 +515,19 @@ class Module extends \yii\base\Module {
                     break;
                 }
             default: {
-                    throw new \yii\base\InvalidConfigException('Yii2 User Module: Provided accessAdmin permission in wrong datatype', 100);
+                    throw new \yii\base\InvalidConfigException('Yii2 User Module: Provided permission in wrong datatype', 100);
                 }
         }
         return $grantAccess;
     }
 
-    private function _caseStringPermission(&$access)
+    private function _caseRBAC($permission)
     {
         if (!$this->params['enableRBAC']) {
             throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);
         }
         $user = \Yii::$app->user;
-        $permission = (string) $this->params['permissions']['accessAdmin'];
-        $error.= "($user->id::$permission)";
-        $access = $user->can($permission);
+        return $user->can($permission);
     }
 
 }
