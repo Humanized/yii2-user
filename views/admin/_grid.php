@@ -26,7 +26,12 @@ $columns = array_merge([[
         return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete', 'id' => $model['id']], $options);
     }]
 // you may configure additional properties here
-            ]], (\Yii::$app->controller->module->params['enableUserName'] ? ['username'] : [])
+            ]], (\Yii::$app->controller->module->params['enableStatusCodes'] ? [['label' => 'Active', 'format' => 'html', 'value' => function ($model, $key, $index, $column) {
+                    $inactive = ((int) $model['status'] == 0 ? TRUE : FALSE);
+                    return \humanized\user\components\GUIHelper::getStatusOutput($inactive);
+            
+                }]] : [])
+                , (\Yii::$app->controller->module->params['enableUserName'] ? ['username'] : [])
                 , [ 'email:email', 'created_at:datetime']);
 
         $config = [
