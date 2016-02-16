@@ -395,8 +395,6 @@ class Module extends \yii\base\Module {
      */
     public function beforeAction($action)
     {
-
-
         //Access Granted By Default
         //Default Error Message
         $error = 'Page not found.';
@@ -451,7 +449,7 @@ class Module extends \yii\base\Module {
                     break;
                 }
             //TODO: implement this action to segregate 
-            case ('admin' && $action->id == 'create'): {
+            case ('admin' && $action->id == 'verify'): {
 
 
                     break;

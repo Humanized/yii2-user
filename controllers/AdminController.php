@@ -60,4 +60,26 @@ class AdminController extends Controller {
         return $this->redirect(['index']);
     }
 
+    /**
+     * User Account Verification
+     * Module permission check requires either user-admin or user-group-admin
+     * priviliges to continue.
+     * @return mixed
+     * @param type $id
+     * @return type
+     */
+    public function actionVerify($id)
+    {
+        $user = User::findOne(['id' => $id]);
+        if (isset($user)) {
+            if ((int) $user->status == 0) {
+                $user->status = 10;
+            } else {
+                $user->status = 0;
+            }
+            $user->save(false);
+        }
+        return $this->redirect(['index']);
+    }
+
 }
