@@ -30,6 +30,13 @@ $this->params['breadcrumbs'][] = 'Accounts';
             ]),
         ]);
 
+        if (\Yii::$app->controller->module->params['enableStatusCodes']) {
+
+
+            echo Html::a(($model->status == 0 ? 'Enable' : 'Disable') . ' Account', ['admin/verify', 'id' => $model->id, 'alt' => TRUE], ['class' => 'btn btn-' . ($model->status == 0 ? 'success' : 'danger')]);
+            echo ' ';
+        }
+
         echo Html::a('Reset Password', ['request-password-reset', 'id' => $model->id], ['class' => 'btn btn-success'])
 
         /*

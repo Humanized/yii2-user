@@ -505,7 +505,11 @@ class Module extends \yii\base\Module {
                     break;
                 }
             case "string": {
-                    $grantAccess = $this->_caseRBAC($p);
+                    if (!$this->params['enableRBAC']) {
+                        throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);
+                    }
+
+                    $grantAccess = \Yii::$app->user->can($permission);
                     break;
                 }
             case "array": {
@@ -519,13 +523,6 @@ class Module extends \yii\base\Module {
         return $grantAccess;
     }
 
-    private function _caseRBAC($permission)
-    {
-        if (!$this->params['enableRBAC']) {
-            throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);
-        }
-        $user = \Yii::$app->user;
-        return $user->can($permission);
-    }
+  
 
 }

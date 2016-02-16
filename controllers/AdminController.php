@@ -68,7 +68,7 @@ class AdminController extends Controller {
      * @param type $id
      * @return type
      */
-    public function actionVerify($id)
+    public function actionVerify($id, $alt = FALSE)
     {
         $user = User::findOne(['id' => $id]);
         if (isset($user)) {
@@ -78,6 +78,9 @@ class AdminController extends Controller {
                 $user->status = 0;
             }
             $user->save(false);
+        }
+        if ($alt == TRUE) {
+            return $this->redirect(['account/index', 'id' => $id]);
         }
         return $this->redirect(['index']);
     }
