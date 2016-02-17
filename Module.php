@@ -395,8 +395,6 @@ class Module extends \yii\base\Module {
      */
     public function beforeAction($action)
     {
-
-
         //Access Granted By Default
         //Default Error Message
         $error = 'Page not found.';
@@ -428,53 +426,39 @@ class Module extends \yii\base\Module {
     /**
      * 
      * Is called when session has a logged-in users
+     * Bail out of controller when this function returns NULL
      * @param type $action
+     * @throws \yii\base\InvalidConfigException
      */
     private function _checkPrivilege($action)
     {
         $access = NULL;
         switch (\Yii::$app->controller->id) {
-            case 'account': {
-                    $access = $this->_checkAccountPrivilege($action);
+            case 'account' && $action->id == 'logout': {
+                    $access = TRUE;
                     break;
                 }
-
+            case 'account' && ($action->id == 'index' || $action->id == 'tokens' || $action->id == 'delete-token' || $action->id == 'request-password-reset'): {
+                    $access = $this->_validateAccountParameters($action->id);
+                    break;
+                }
             case ('admin' && $action->id == 'index'): {
-
-
+                    $access = $this->_switchPermission('access.dashboard');
                     break;
                 }
-
             case ('admin' && $action->id == 'delete'): {
-
+                    $access = $this->_switchPermission('delete.account');
 
                     break;
                 }
             //TODO: implement this action to segregate 
-            case ('admin' && $action->id == 'create'): {
+            case ('admin' && $action->id == 'verify'): {
 
-
+                    $access = $this->_switchPermission('verifiy.account');
                     break;
                 }
         }
-
         return $access;
-    }
-
-    private function _checkAccountPrivilege($action)
-    {
-        $grantAccess = FALSE;
-        switch ($action->id) {
-            case 'index' || 'tokens' || 'delete-token' || 'request-password-reset': {
-                    $grantAccess = $this->_validateAccountParameters($action->id);
-                    break;
-                }
-            case 'logout': {
-                    $grantAccess = TRUE;
-                    break;
-                }
-        }
-        return $grantAccess;
     }
 
     private function _validateAccountParameters($action)
@@ -499,35 +483,25 @@ class Module extends \yii\base\Module {
 
     private function _switchPermission($permission)
     {
-        $grantAccess = FALSE;
-        $p = $this->params['permissions'][$permission];
+        $permissionGranted = FALSE;
+        $permissionParam = $this->params['permissions'][$permission];
         switch (gettype($p)) {
             case "boolean": {
-                    $grantAccess = $p;
+                    $permissionGranted = $permissionParam;
                     break;
                 }
             case "string": {
-                    $grantAccess = $this->_caseRBAC($p);
-                    break;
-                }
-            case "array": {
-                    $grantAccess = NULL;
+                    if (!$this->params['enableRBAC']) {
+                        throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);
+                    }
+                    $grantAccess = \Yii::$app->user->can($permissionParam);
                     break;
                 }
             default: {
-                    throw new \yii\base\InvalidConfigException('Yii2 User Module: Provided permission in wrong datatype', 100);
+                    throw new \yii\base\InvalidConfigException('Yii2 User Module: Permission provided in wrong datatype', 100);
                 }
         }
         return $grantAccess;
-    }
-
-    private function _caseRBAC($permission)
-    {
-        if (!$this->params['enableRBAC']) {
-            throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);
-        }
-        $user = \Yii::$app->user;
-        return $user->can($permission);
     }
 
 }
