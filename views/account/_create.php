@@ -30,23 +30,26 @@ if ($model->scenario != \humanized\user\models\common\User::SCENARIO_SIGNUP) {
                 'allowClear' => true
             ],
         ]);
-        ;
+        
     }
-    if (\Yii::$app->controller->module->params['enableStatusCodes']) {
+    if (\Yii::$app->controller->module->params['enableStatusCodes'] && \Yii::$app->controller->module->params['permissions']['verify.account']) {
         echo $form->field($model, 'status')->dropDownList(\humanized\user\components\GUIHelper::getStatusList(), ['prompt' => 'Select Status Value']);
     }
-//Optional Password Autogeneration
-    echo $form->field($model, 'generatePassword')->checkBox(['attribute' => 'generatePassword', 'id' => 'generate-password', 'onclick' => "this.checked ?  $('#password-fields').hide() : $('#password-fields').show()",
-        'format' => 'boolean']);
+//Password Generation -- Forces when enableUserVerfication is set to TRUE
+    if (!\Yii::$app->controller->module->params['enableUserVerification']) {
+        echo $form->field($model, 'generatePassword')->checkBox(['attribute' => 'generatePassword', 'id' => 'generate-password', 'onclick' => "this.checked ?  $('#password-fields').hide() : $('#password-fields').show()",
+            'format' => 'boolean']);
+    }
 }
 ?>
 <div id="password-fields" style="display:<?= $model->generatePassword ? "none" : "block" ?>">
-    <?php
-    echo $form->field($model, 'password')->input('password')->hint('Password should be within A-Za-z0-9')->label('Password');
-    echo $form->field($model, 'password_confirm')->input('password')->label('Confirm Password')
-    ?>
-</div>
 <?php
-echo Html::submitButton('Submit', ['class' => 'btn btn-primary']);
-ActiveForm::end();
+echo $form->field($model, 'password')->input('password')->hint('Password should be within A-Za-z0-9')->label('Password');
+echo $form->field($model, 'password_confirm')->input('password')->label('Confirm Password')
+?>
+</div>
+    <?php
+    echo Html::submitButton('Submit', ['class' => 'btn btn-primary']);
+    ActiveForm::end();
 
+    

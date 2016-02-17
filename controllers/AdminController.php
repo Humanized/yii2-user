@@ -27,6 +27,9 @@ class AdminController extends Controller {
     {
         //Account Creation Model (admin scenario)
         $model = new User(['scenario' => User::SCENARIO_ADMIN]);
+        if (\Yii::$app->controller->module->params['enableAdminVerification'] && !\Yii::$app->controller->module->params['permissions']['verify.account']) {
+            $model->status = 0;
+        }
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             //reset model on success
             $model = new User(['scenario' => User::SCENARIO_ADMIN]);

@@ -247,7 +247,7 @@ class Module extends \yii\base\Module {
         $this->params['enablePasswords'] = $this->enablePasswords;
         $this->params['enableSignUp'] = $this->enableSignUp;
         if ($this->enableSignUp) {
-            $this->_public[] = 'sign-up';
+            $this->_public[] = 'signup';
         }
     }
 

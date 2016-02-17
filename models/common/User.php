@@ -160,7 +160,11 @@ class User extends ActiveRecord implements IdentityInterface {
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_SIGNUP] = ['email', 'password', 'password_confirm'];
+        $scenarios[self::SCENARIO_SIGNUP] = ['email'];
+        if (!$this->_module->params['enableUserVerification']) {
+            $scenarios[self::SCENARIO_SIGNUP][] = 'password';
+            $scenarios[self::SCENARIO_SIGNUP][] = 'password_confirm';
+        }
         $scenarios[self::SCENARIO_PWDRST] = [];
         return $scenarios;
     }
