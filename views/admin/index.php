@@ -10,7 +10,15 @@ $this->params['breadcrumbs'][] = 'User Management';
         </div>
         <div class="well">
             <blockquote><span class="glyphicon glyphicon-plus"></span> Create New User</blockquote>
-            <?= $this->render('/account/_create', ['model' => $model]) ?>
+
+            <?=
+            humanized\user\components\UserCreateForm::widget([
+                'model' => $model,
+                'enableRBAC'=>TRUE,
+                'statusDropdownData' => \humanized\user\components\GUIHelper::getStatusList()])
+        
+            ?>
+
         </div>   
     </aside>
 
