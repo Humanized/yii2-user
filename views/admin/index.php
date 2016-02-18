@@ -12,11 +12,10 @@ $this->params['breadcrumbs'][] = 'User Management';
             <blockquote><span class="glyphicon glyphicon-plus"></span> Create New User</blockquote>
 
             <?=
-            humanized\user\components\UserCreateForm::widget([
+            humanized\user\components\AccountCreateForm::widget([
                 'model' => $model,
-                'enableRBAC'=>TRUE,
+                'enableRBAC' => TRUE,
                 'statusDropdownData' => \humanized\user\components\GUIHelper::getStatusList()])
-        
             ?>
 
         </div>   
@@ -24,7 +23,7 @@ $this->params['breadcrumbs'][] = 'User Management';
 
     <div class="col-md-8">
         <?=
-        $this->render('_grid', [
+        humanized\user\components\AccountGrid::widget([
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel
         ])

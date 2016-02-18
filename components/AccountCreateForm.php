@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 
 /**
- * User Creation Widget for Yii2 - By Humanized
+ * User Account Creation Widget for Yii2 - By Humanized
  * 
  * Provides an all-purpose user creation form for use in different scenarios (i.e. administration or signup)
  * 
@@ -21,7 +21,7 @@ use kartik\select2\Select2;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class UserCreateForm extends Widget {
+class AccountCreateForm extends Widget {
 
     /**
      *
@@ -178,7 +178,7 @@ class UserCreateForm extends Widget {
         $fields = [];
         preg_match_all('/{(.*?)}/', $this->template, $fields);
         array_map(function($caller) {
-    
+
             if (isset($this->extraAttributesBefore[$caller])) {
                 $this->extraAttributesBefore[$caller]($this->model, $this->form);
             }
