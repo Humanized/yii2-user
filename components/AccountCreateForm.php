@@ -21,7 +21,8 @@ use kartik\select2\Select2;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class AccountCreateForm extends Widget {
+class AccountCreateForm extends Widget
+{
 
     /**
      *
@@ -144,9 +145,9 @@ class AccountCreateForm extends Widget {
             $userRoles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
 
             foreach ($userRoles as $role) {
-                $this->roleDropdownData[$role['name']] = $role['name'];
-                foreach (\Yii::$app->authManager->getChildren($role['name']) as $childRole) {
-                    $this->roleDropdownData[$childRole['name']] = $childRole['name'];
+                $this->roleDropdownData[$role->name] = $role->name;
+                foreach (\Yii::$app->authManager->getChildren($role->name) as $childRole) {
+                    $this->roleDropdownData[$childRole->name] = $childRole->name;
                 }
             }
         }
@@ -213,7 +214,7 @@ class AccountCreateForm extends Widget {
         if ($this->enableRBAC && !empty($this->roleDropdownData)) {
             echo $this->form->field($this->model, 'roles')->widget(Select2::classname(), [
                 'data' => $this->roleDropdownData,
-                'language' => Yii::$app->language,
+                'language' => \Yii::$app->language,
                 'options' => ['placeholder' => 'Select Roles ...', 'multiple' => $this->multiRole],
                 'pluginOptions' => [
                     'allowClear' => true

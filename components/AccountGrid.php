@@ -126,7 +126,7 @@ class AccountGrid extends Widget {
     {
         /* Check if username column exists in corresponding AR database table */
         if ($this->searchModel->hasAttribute('username')) {
-            echo $this->form->field($this->model, 'username')->input('username');
+                   $this->_columns[] = 'username';
         }
         $this->_columns[] = 'email:email';
     }

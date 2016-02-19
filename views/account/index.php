@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = 'Accounts';
         humanized\user\components\AccountDetails::widget([
             'model' => $model,
             'enableRBAC' => \Yii::$app->controller->module->params['enableRBAC'],
+            'displayRBACMode' => \humanized\user\components\AccountDetails::DISPLAY_ROLE_ALL,
             'enable' => \Yii::$app->controller->module->params['permissions']['view.account'],
             'canVerifyAccount' => \Yii::$app->controller->module->params['permissions']['verify.account'],
             'canDeleteAccount' => \Yii::$app->controller->module->params['permissions']['delete.account'],

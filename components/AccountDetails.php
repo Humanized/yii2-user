@@ -18,7 +18,8 @@ use yii\bootstrap\Html;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class AccountDetails extends Widget {
+class AccountDetails extends Widget
+{
 
     const DISPLAY_ROLE_DEFAULT = 0;
     const DISPLAY_ROLE_ALL = 1;
@@ -36,7 +37,7 @@ class AccountDetails extends Widget {
     public $canVerifyAccount = TRUE;
     public $enableRBAC = FALSE;
     public $rbacAttributes = [];
-    public $displayRBACFields = FALSE;
+    public $displayRBACFields = TRUE;
     public $displayRBACMode = self::DISPLAY_ROLE_DEFAULT;
     public $roleMapCallback = NULL;
     public $roleMapImplodeSeperator = ' ';
@@ -70,6 +71,9 @@ class AccountDetails extends Widget {
         $direct = \Yii::$app->authManager->getRolesByUser($this->model->id);
         $out = [];
         $value = NULL;
+        $this->rbacAttributes = [];
+
+
 
         switch ($this->displayRBACMode) {
             case self::DISPLAY_ROLE_DEFAULT: {
@@ -79,9 +83,19 @@ class AccountDetails extends Widget {
             case self::DISPLAY_ROLE_ALL: {
                     $this->rbacAttributes[] = ['label' => 'Direct Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback, $direct))];
                     $callback = function($r) {
-                        return array_map($this->roleMapCallback, \Yii::$app->authManager->getChildren($r->name));
+                        $queue = \Yii::$app->authManager->getChildren($r->name);
+                        $out = [];
+                        while (!empty($queue)) {
+                            $current = array_shift($queue);
+                            $out[] = $current->name;
+                            $children = \Yii::$app->authManager->getChildren($current->name);
+                            $queue = array_merge($queue, $children);
+                        }
+
+
+                        return $out;
                     };
-                    $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_merge(array_map($callback, $direct)))];
+                    $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_merge(call_user_func_array('array_merge', array_map($callback, $direct))))];
 
                     break;
                 }
@@ -128,7 +142,7 @@ class AccountDetails extends Widget {
     {
         /* Check if username column exists in corresponding AR database table */
         if ($this->model->hasAttribute('username')) {
-            echo $this->form->field($this->model, 'username')->input('username');
+            $this->_attributes[] = 'username';
         }
         $this->_attributes[] = 'email:email';
     }
@@ -153,7 +167,7 @@ class AccountDetails extends Widget {
     private function _setupRbacAttributes()
     {
         if ($this->enableRBAC && $this->displayRBACFields) {
-            $this->_attributes[] = array_merge($this->_attributes, $this->rbacAttributes);
+            $this->_attributes = array_merge($this->_attributes, $this->rbacAttributes);
         }
     }
 
