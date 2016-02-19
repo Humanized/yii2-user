@@ -35,7 +35,7 @@ class GUIHelper {
 
     public static function getStatusOutput($inactive)
     {
-        return'<span style="color:' . ($inactive == FALSE ? 'green' : 'red') . '" class="glyphicon glyphicon-' . ($inactive == FALSE ? 'ok' : 'remove') . '"></span>';
+        return'<span style="color:' . ($inactive == FALSE ? 'green' : 'red') . '" class="glyphicon glyphicon-' . ($inactive == FALSE ? 'ok' : 'remove') . '"></span>' . ($inactive == FALSE ? ' Active' : ' Inactive');
     }
 
     /**

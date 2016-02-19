@@ -29,9 +29,9 @@ class AccountDetails extends Widget {
      * @var yii\db\ActiveRecord
      */
     public $model = NULL;
-    public $displayStatusFields = FALSE;
-    public $displayCreatedAt = FALSE;
-    public $displayUpdatedAt = FALSE;
+    public $displayStatusFields = TRUE;
+    public $displayCreatedAt = TRUE;
+    public $displayUpdatedAt = TRUE;
     public $canDeleteAccount = FALSE;
     public $canVerifyAccount = TRUE;
     public $enableRBAC = FALSE;
@@ -146,10 +146,7 @@ class AccountDetails extends Widget {
     private function _setupStatusAttributes()
     {
         if ($this->displayStatusFields && $this->model->hasAttribute('status')) {
-            $this->_attributes[] = ['label' => 'Status', 'format' => 'html', 'value' => function ($model, $key, $index, $column) {
-                    $inactive = ((int) $model['status'] == 0 ? TRUE : FALSE);
-                    return \humanized\user\components\GUIHelper::getStatusOutput($inactive);
-                }];
+            $this->_attributes[] = ['label' => 'Status', 'format' => 'html', 'value' => \humanized\user\components\GUIHelper::getStatusOutput(((int) $this->model->status == 0))];
         }
     }
 
