@@ -143,7 +143,7 @@ class AccountGrid extends Widget {
 
     private function _setupStatusColumns()
     {
-        if ($this->searchModel->hasAttribute('status')) {
+        if ($this->searchModel->hasAttribute('status') && $this->displayStatusColumn) {
             $this->_columns[] = ['label' => 'Status', 'format' => 'html', 'value' => function ($model, $key, $index, $column) {
                     $inactive = ((int) $model['status'] == 0 ? TRUE : FALSE);
                     return \humanized\user\components\GUIHelper::getStatusOutput($inactive);

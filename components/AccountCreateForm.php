@@ -157,20 +157,21 @@ class AccountCreateForm extends Widget {
      */
     public function run()
     {
+        if ($this->enable) {
+            //Begin ActtiveForm widget
+            $this->form = ActiveForm::begin([
+                        'id' => 'create-user',
+                        'options' => [
+                            'class' => 'form',
+                            'enctype' => 'multipart/form-data'
+                        ],
+            ]);
 
-        //Begin ActtiveForm widget
-        $this->form = ActiveForm::begin([
-                    'id' => 'create-user',
-                    'options' => [
-                        'class' => 'form',
-                        'enctype' => 'multipart/form-data'
-                    ],
-        ]);
-
-        $this->_setupFields();
-        echo Html::submitButton('Submit', ['class' => 'btn btn-primary']);
-        //Begin ActtiveForm widget
-        ActiveForm::end();
+            $this->_setupFields();
+            echo Html::submitButton('Submit', ['class' => 'btn btn-primary']);
+            //Begin ActtiveForm widget
+            ActiveForm::end();
+        }
     }
 
     private function _setupFields()

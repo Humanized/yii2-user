@@ -115,6 +115,9 @@ class Module extends \yii\base\Module {
      * Defaults to TRUE    
      */
     public $enableStatusCodes = TRUE;
+    public $displayTimestamps = TRUE;
+    public $displayCreatedAt = TRUE;
+    public $displayUpdatedAt = TRUE;
     public $statusCodeTable = NULL;
     public $statusCodeTableId = 'id';
     public $statusCodeTableName = 'name';
@@ -372,6 +375,7 @@ class Module extends \yii\base\Module {
             'access.dashboard' => $this->_isRoot ? TRUE : FALSE,
             'create.account' => $this->_isRoot ? TRUE : FALSE,
             'delete.account' => $this->_isRoot ? TRUE : FALSE,
+            'view.account' => $this->_isRoot ? TRUE : FALSE,
             'verify.account' => $this->_isRoot ? TRUE : FALSE,
         ];
         //Overwrite default values with RBAC permissions when not root
