@@ -18,7 +18,8 @@ use yii\bootstrap\Html;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class AccountDetails extends Widget {
+class AccountDetails extends Widget
+{
 
     const DISPLAY_ROLE_DEFAULT = 0;
     const DISPLAY_ROLE_ALL = 1;
@@ -36,7 +37,7 @@ class AccountDetails extends Widget {
     public $canVerifyAccount = TRUE;
     public $enableRBAC = FALSE;
     public $rbacAttributes = [];
-    public $displayRBACFields = FALSE;
+    public $displayRBACFields = TRUE;
     public $displayRBACMode = self::DISPLAY_ROLE_DEFAULT;
     public $roleMapCallback = NULL;
     public $roleMapImplodeSeperator = ' ';
@@ -128,7 +129,7 @@ class AccountDetails extends Widget {
     {
         /* Check if username column exists in corresponding AR database table */
         if ($this->model->hasAttribute('username')) {
-            echo $this->form->field($this->model, 'username')->input('username');
+            $this->_attributes[] = 'username';
         }
         $this->_attributes[] = 'email:email';
     }

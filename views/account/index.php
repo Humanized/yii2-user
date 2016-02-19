@@ -21,7 +21,8 @@ $this->params['breadcrumbs'][] = 'Accounts';
     <div class="col-md-8">
         <?=
         humanized\user\components\AccountDetails::widget([
-            'model' => $model
+            'model' => $model,
+            'enableRBAC' => TRUE,
         ])
         ?>
 
