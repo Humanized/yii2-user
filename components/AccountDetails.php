@@ -18,8 +18,7 @@ use yii\bootstrap\Html;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class AccountDetails extends Widget
-{
+class AccountDetails extends Widget {
 
     const DISPLAY_ROLE_DEFAULT = 0;
     const DISPLAY_ROLE_ALL = 1;
@@ -74,36 +73,37 @@ class AccountDetails extends Widget
         $this->rbacAttributes = [];
 
 
+        if (!empty($direct)) {
+            switch ($this->displayRBACMode) {
+                case self::DISPLAY_ROLE_DEFAULT: {
+                        $this->rbacAttributes[] = ['label' => 'Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback, $direct))];
+                        break;
+                    }
+                case self::DISPLAY_ROLE_ALL: {
+                        $this->rbacAttributes[] = ['label' => 'Direct Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback, $direct))];
+                        $callback = function($r) {
+                            $queue = \Yii::$app->authManager->getChildren($r->name);
+                            $out = [];
+                            while (!empty($queue)) {
+                                $current = array_shift($queue);
+                                $out[] = $current->name;
+                                $children = \Yii::$app->authManager->getChildren($current->name);
+                                $queue = array_merge($queue, $children);
+                            }
+                            return $out;
+                        };
 
-        switch ($this->displayRBACMode) {
-            case self::DISPLAY_ROLE_DEFAULT: {
-                    $this->rbacAttributes[] = ['label' => 'Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback, $direct))];
-                    break;
-                }
-            case self::DISPLAY_ROLE_ALL: {
-                    $this->rbacAttributes[] = ['label' => 'Direct Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback, $direct))];
-                    $callback = function($r) {
-                        $queue = \Yii::$app->authManager->getChildren($r->name);
-                        $out = [];
-                        while (!empty($queue)) {
-                            $current = array_shift($queue);
-                            $out[] = $current->name;
-                            $children = \Yii::$app->authManager->getChildren($current->name);
-                            $queue = array_merge($queue, $children);
-                        }
-
-
-                        return $out;
-                    };
-                    $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_merge(call_user_func_array('array_merge', array_map($callback, $direct))))];
-
-                    break;
-                }
-            case self::DISPLAY_ROLE_COMBINED: {
+                        $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_merge(call_user_func_array('array_merge', array_map($callback, $direct))))];
 
 
-                    break;
-                }
+                        break;
+                    }
+                case self::DISPLAY_ROLE_COMBINED: {
+
+
+                        break;
+                    }
+            }
         }
     }
 

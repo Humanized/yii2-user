@@ -206,6 +206,7 @@ class Module extends \yii\base\Module {
         $this->initModuleOptions();
         $this->initGridOptions();
         $this->initStatusCodes();
+        $this->initTimestamps();
 
         //Permission Related initialisation (not available when CLI)
         if (php_sapi_name() != "cli" && !\Yii::$app->user->isGuest) {
@@ -287,6 +288,13 @@ class Module extends \yii\base\Module {
             $this->params['statusCodes'] = [0 => 'INACTIVE', 10 => 'ACTIVE'];
         }
         $this->params['defaultStatusCode'] = $this->defaultStatusCode;
+    }
+
+    private function initTimestamps()
+    {
+        $this->params['displayTimestamps'] = $this->displayTimestamps;
+        $this->params['displayCreatedAt'] = $this->displayCreatedAt;
+        $this->params['displayUpdatedAt'] = $this->displayUpdatedAt;
     }
 
     /**

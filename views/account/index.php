@@ -24,7 +24,6 @@ $this->params['breadcrumbs'][] = 'Accounts';
             'model' => $model,
             'enableRBAC' => \Yii::$app->controller->module->params['enableRBAC'],
             'displayRBACMode' => \humanized\user\components\AccountDetails::DISPLAY_ROLE_ALL,
-            'enable' => \Yii::$app->controller->module->params['permissions']['view.account'],
             'canVerifyAccount' => \Yii::$app->controller->module->params['permissions']['verify.account'],
             'canDeleteAccount' => \Yii::$app->controller->module->params['permissions']['delete.account'],
             'displayCreatedAt' => (\Yii::$app->controller->module->params['displayTimestamps'] || \Yii::$app->controller->module->params['displayCreatedAt']),
