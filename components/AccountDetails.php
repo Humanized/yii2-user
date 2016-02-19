@@ -71,6 +71,9 @@ class AccountDetails extends Widget
         $direct = \Yii::$app->authManager->getRolesByUser($this->model->id);
         $out = [];
         $value = NULL;
+        $this->rbacAttributes = [];
+
+
 
         switch ($this->displayRBACMode) {
             case self::DISPLAY_ROLE_DEFAULT: {
@@ -80,9 +83,19 @@ class AccountDetails extends Widget
             case self::DISPLAY_ROLE_ALL: {
                     $this->rbacAttributes[] = ['label' => 'Direct Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback, $direct))];
                     $callback = function($r) {
-                        return array_map($this->roleMapCallback, \Yii::$app->authManager->getChildren($r->name));
+                        $queue = \Yii::$app->authManager->getChildren($r->name);
+                        $out = [];
+                        while (!empty($queue)) {
+                            $current = array_shift($queue);
+                            $out[] = $current->name;
+                            $children = \Yii::$app->authManager->getChildren($current->name);
+                            $queue = array_merge($queue, $children);
+                        }
+
+
+                        return $out;
                     };
-                    $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_merge(array_map($callback, $direct)))];
+                    $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_merge(call_user_func_array('array_merge', array_map($callback, $direct))))];
 
                     break;
                 }
@@ -154,7 +167,7 @@ class AccountDetails extends Widget
     private function _setupRbacAttributes()
     {
         if ($this->enableRBAC && $this->displayRBACFields) {
-            $this->_attributes[] = array_merge($this->_attributes, $this->rbacAttributes);
+            $this->_attributes = array_merge($this->_attributes, $this->rbacAttributes);
         }
     }
 

@@ -22,7 +22,8 @@ $this->params['breadcrumbs'][] = 'Accounts';
         <?=
         humanized\user\components\AccountDetails::widget([
             'model' => $model,
-            'enableRBAC' => TRUE,
+            'enableRBAC' => \Yii::$app->controller->module->params['enableRBAC'],
+            'displayRBACMode' => \humanized\user\components\AccountDetails::DISPLAY_ROLE_ALL,
         ])
         ?>
 
