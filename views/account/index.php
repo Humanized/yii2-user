@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = 'Accounts';
 
     <div class="col-md-8">
         <?=
-        humanized\user\components\AccountDetails::widget([
+        humanized\user\components\AccountDetails::widget(array_merge([
             'model' => $model,
             'enableRBAC' => \Yii::$app->controller->module->params['enableRBAC'],
             'displayRBACMode' => \humanized\user\components\AccountDetails::DISPLAY_ROLE_ALL,
@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = 'Accounts';
             'canDeleteAccount' => \Yii::$app->controller->module->params['permissions']['delete.account'],
             'displayCreatedAt' => (\Yii::$app->controller->module->params['displayTimestamps'] || \Yii::$app->controller->module->params['displayCreatedAt']),
             'displayUpdatedAt' => (\Yii::$app->controller->module->params['displayTimestamps'] || \Yii::$app->controller->module->params['displayUpdatedAt']),
-        ])
+                        ], \Yii::$app->controller->module->params['detailOptions']))
         ?>
 
 

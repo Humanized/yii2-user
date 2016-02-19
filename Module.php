@@ -23,10 +23,46 @@ class Module extends \yii\base\Module {
 
     /**
      *
-     * @var UserInterface 
+     * @var UserInterface - Considers IdentityClass set in user component is default
      */
     public $identityClass = NULL;
+
+    /**
+     *
+     * @var callable - Function taking some string returning the user model. By default findUser defined by the user component is used as default
+     */
     public $fnUser = NULL;
+
+    /**
+     * @since 0.1
+     * @var array<mixed> - Module permission configuration array
+     * 
+     * Several permission variables can be set to allow access seggregation to the various facilities provided by the module .
+     * 
+     * Boolean flags can be assigned to manage access control.
+     * When the enableRBAC flag is set to TRUE, the built-in RBAC interface is employed, as setup through the authManager component. 
+     * In this case, string-based permission-name can be configured to manage access control.
+     *
+     * 
+     * Following configuration options are supported:
+     * 
+     * <table>
+     * 
+     * <tr><td><i>access.dashboard</i></td><td>Permission allowing access to the user management dashboard. Default FALSE</td></tr>
+     * <tr><td><i>create.account</i></td><td>Permission allowing creation of user accounts. Allows assigning users with role equal than or lower than administrator role undertaking the action. Default FALSE</td></tr>
+     * <tr><td><i>delete.account</i></td><td>Permission allowing deletion of user accounts. Default FALSE</td></tr>
+     * <tr><td><i>verify.account</i></td><td>Permission allowing verification of user accounts. Useful when the enableAdminVerification flag is set to TRUE. Default FALSE</td></tr>
+     * </table>
+     *  
+     */
+    public $permissions = [
+    ];
+    public $gridOptions = [
+    ];
+    public $formOptions = [
+    ];
+    public $detailOptions = [
+    ];
 
     /**
      * @since 0.1
@@ -126,31 +162,6 @@ class Module extends \yii\base\Module {
 
     /**
      * @since 0.1
-     * @var array<mixed> - Module permission configuration array
-     * 
-     * Several permission variables can be set to allow access seggregation to the various facilities provided by the module .
-     * 
-     * Boolean flags can be assigned to manage access control.
-     * When the enableRBAC flag is set to TRUE, the built-in RBAC interface is employed, as setup through the authManager component. 
-     * In this case, string-based permission-name can be configured to manage access control.
-     *
-     * 
-     * Following configuration options are supported:
-     * 
-     * <table>
-     * 
-     * <tr><td><i>access.dashboard</i></td><td>Permission allowing access to the user management dashboard. Default FALSE</td></tr>
-     * <tr><td><i>create.account</i></td><td>Permission allowing creation of user accounts. Allows assigning users with role equal than or lower than administrator role undertaking the action. Default FALSE</td></tr>
-     * <tr><td><i>delete.account</i></td><td>Permission allowing deletion of user accounts. Default FALSE</td></tr>
-     * <tr><td><i>verify.account</i></td><td>Permission allowing verification of user accounts. Useful when the enableAdminVerification flag is set to TRUE. Default FALSE</td></tr>
-     * </table>
-     *  
-     */
-    public $permissions = [
-    ];
-
-    /**
-     * @since 0.1
      * @var mixed Single or list of root user(s) identified through e-mail address
      * 
      * When signed-on using a qualified account, all configurable module permission mechanisms are bypassed.
@@ -180,7 +191,47 @@ class Module extends \yii\base\Module {
      * Defaults to FALSE    
      */
     public $enableRBAC = FALSE;
-    public $enableRBACInterface = FALSE;
+
+    /**
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1
+     * @var boolean
+     * 
+     * When enabled, RBAC roles are colored using additional configuration options.
+     * 
+     * By default, once set to true, this module depends on the existence of http://www.github.com/humanized/yii2-rbac) to provide the mapping mechanism between RBAC roles and color codes
+     * 
+     * The dependency can be resolved true manual override however, by setting the roleColor option.
+     * 
+     * By default,  
+     * 
+     * 
+     * 
+     * 
+     */
+    public $colorRoles = FALSE;
+
+    /**
+     * @author Jeffrey Geyssens <jeffrey@humanized.be>
+     * @since 0.1
+     * @var NULL|Array<string:string>|String
+     * 
+     * Disabled when set to NULL
+     * 
+     * Configure to enable using following datatypes:
+     * 
+     * <ul>
+     * <li>An array: Mapping role-names (array-key) to color codes </li>   
+     * <li>A string: Providing a path to some class that implements a static function getColor method taking a role-name as parameter. </li>
+     * </ul>
+     * 
+     * Color codes are strings interpreted as followed:
+     * <ul>
+     * <li>Prefixed using either # or (at): color is interpreted as HTML color code (prefix (at) is ignored to allow specification of HTML color names) </li>
+     * <li>Else, it is considered a classname</li>
+     * </ul>
+     */
+    public $roleColors = NULL;
 
     /**
      * @author Jeffrey Geyssens <jeffrey@humanized.be>
@@ -202,11 +253,20 @@ class Module extends \yii\base\Module {
         if (\Yii::$app instanceof \yii\console\Application) {
             $this->controllerNamespace = 'humanized\user\commands';
         }
+        /**
+         * Configure Global Module Options
+         */
         $this->initIdentityModel();
         $this->initModuleOptions();
-        $this->initGridOptions();
         $this->initStatusCodes();
         $this->initTimestamps();
+
+        /**
+         * Configure Module Interface Options
+         */
+        $this->params['gridOptions'] = $this->gridOptions;
+        $this->params['formOptions'] = $this->formOptions;
+        $this->params['detailOptions'] = $this->detailOptions;
 
         //Permission Related initialisation (not available when CLI)
         if (php_sapi_name() != "cli" && !\Yii::$app->user->isGuest) {
@@ -264,9 +324,13 @@ class Module extends \yii\base\Module {
      */
     private function initGridOptions()
     {
-        $this->params['enablePjax'] = $this->enablePjax;
-        $this->params['enableKartik'] = $this->enablePjax;
-        $this->params['enableDynagrid'] = $this->enableRBAC;
+
+        /*
+          $this->params['enablePjax'] = $this->enablePjax;
+          $this->params['enableKartik'] = $this->enablePjax;
+          $this->params['enableDynagrid'] = $this->enableRBAC;
+         * 
+         */
     }
 
     /**
