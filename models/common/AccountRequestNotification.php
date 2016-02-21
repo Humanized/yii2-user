@@ -25,7 +25,7 @@ class AccountRequestNotification extends Model
                     //  'status' => User::STATUS_ACTIVE,
                     'email' => $this->email,
         ]);
-        $admins = User::findAll(['enable_notifcation' => TRUE]);
+        $admins = User::findAll(['enable_notifications' => TRUE]);
 
         foreach ($admins as $admin) {
             \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/accountRequestNotification-html', 'text' => '@vendor/humanized/yii2-user/mail/accountRequestNotification-text'], ['account' => $account])

@@ -93,6 +93,7 @@ class User extends ActiveRecord implements IdentityInterface
         if (isset($this->_module)) {
             $this->defaultStatusCode = $this->_module->params['enableAdminVerification'] ? self::STATUS_INACTIVE : self::STATUS_ACTIVE;
             $this->statusCodes = array_keys($this->_module->params['statusCodes']);
+   
         }
 
         switch ($this->getScenario()) {
@@ -228,6 +229,18 @@ class User extends ActiveRecord implements IdentityInterface
         return static::findOne([($isEmail ? 'email' : 'username') => $username]);
     }
 
+    public static function findByEnabledUsername($username)
+    {
+        $identity = \Yii::$app->user->identityClass;
+        $isEmail = filter_var($username, FILTER_VALIDATE_EMAIL);
+        $model = new $identity();
+        if (!$model->hasAttribute('username') && !$isEmail) {
+            return NULL;
+        }
+
+        return static::findOne([($isEmail ? 'email' : 'username') => $username, 'status' => self::STATUS_ACTIVE]);
+    }
+
     /**
      * Finds user by password reset token
      *
@@ -358,7 +371,8 @@ class User extends ActiveRecord implements IdentityInterface
     {
 
         if ($insert) {
-            if ($this->status == 0 && ($this->_module->params['enableAdminVerification'] == TRUE)) {
+            if ($this->status == self::STATUS_INACTIVE && ($this->_module->params['enableAdminVerification'] == TRUE)) {
+                
                 $model = new AccountRequestNotification(['email' => $this->email]);
                 if (!($model->validate() && $model->sendEmail())) {
                     return false;

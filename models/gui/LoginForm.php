@@ -9,7 +9,8 @@ use humanized\user\models\common\User;
 /**
  * LoginForm is the model behind the login form.
  */
-class LoginForm extends Model {
+class LoginForm extends Model
+{
 
     public $username;
     public $password;
@@ -69,7 +70,7 @@ class LoginForm extends Model {
     public function getUser()
     {
         if ($this->_user === false) {
-            $this->_user = User::findByUsername($this->username);
+            $this->_user = User::findByEnabledUsername($this->username);
         }
 
         return $this->_user;

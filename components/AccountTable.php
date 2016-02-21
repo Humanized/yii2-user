@@ -57,7 +57,6 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
             if (!isset($record['password_confirm'])) {
                 $record['password_confirm'] = $record['password'];
             }
-            return;
         } else {
             $record['generatePassword'] = TRUE;
         }
