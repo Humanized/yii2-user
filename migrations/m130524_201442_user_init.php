@@ -2,7 +2,8 @@
 
 use yii\db\Migration;
 
-class m130524_201442_user_init extends Migration {
+class m130524_201442_user_init extends Migration
+{
 
     private $_params = NULL;
     private $_tableOptions = NULL;

@@ -8,26 +8,10 @@ use yii\base\Model;
 /**
  * Password reset request form
  */
-class PasswordResetRequest extends Model {
+class AccountRequestNotification extends Model
+{
 
     public $email;
-
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            ['email', 'filter', 'filter' => 'trim'],
-            ['email', 'required'],
-            ['email', 'email'],
-            ['email', 'exist',
-                'targetClass' => '\humanized\user\models\common\User',
-                //      'filter' => ['status' => User::STATUS_ACTIVE],
-                'message' => 'There is no user with such email.'
-            ],
-        ];
-    }
 
     /**
      * Sends an email with a link, for resetting the password.
@@ -36,30 +20,21 @@ class PasswordResetRequest extends Model {
      */
     public function sendEmail()
     {
-
         /* @var $user User */
-        $user = User::findOne([
+        $account = User::findOne([
                     //  'status' => User::STATUS_ACTIVE,
                     'email' => $this->email,
         ]);
+        $admins = User::findAll(['enable_notifcation' => TRUE]);
 
-
-        if ($user) {
-            $user->setScenario(User::SCENARIO_PWDRST);
-            if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
-                $user->generatePasswordResetToken();
-            }
-
-            if ($user->save()) {
-                return \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/passwordResetToken-html', 'text' => '@vendor/humanized/yii2-user/mail/passwordResetToken-text'], ['user' => $user])
-                                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
-                                ->setTo($this->email)
-                                ->setSubject('Password reset for ' . \Yii::$app->name)
-                                ->send();
-            }
+        foreach ($admins as $admin) {
+            \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/accountRequestNotification-html', 'text' => '@vendor/humanized/yii2-user/mail/accountRequestNotification-text'], ['account' => $account])
+                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
+                    ->setTo($admin->email)
+                    ->setSubject('Account request pending approval ' . \Yii::$app->name)
+                    ->send();
         }
-
-        return false;
+        return true;
     }
 
     public function loadMail($id)

@@ -8,7 +8,8 @@ use yii\base\Model;
 /**
  * Password reset request form
  */
-class PasswordResetRequest extends Model {
+class PasswordResetRequest extends Model
+{
 
     public $email;
 
@@ -36,14 +37,11 @@ class PasswordResetRequest extends Model {
      */
     public function sendEmail()
     {
-
         /* @var $user User */
         $user = User::findOne([
                     //  'status' => User::STATUS_ACTIVE,
                     'email' => $this->email,
         ]);
-
-
         if ($user) {
             $user->setScenario(User::SCENARIO_PWDRST);
             if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
@@ -59,7 +57,7 @@ class PasswordResetRequest extends Model {
             }
         }
 
-        return false;
+        return true;
     }
 
     public function loadMail($id)

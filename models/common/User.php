@@ -357,20 +357,30 @@ class User extends ActiveRecord implements IdentityInterface
     public function afterSave($insert, $changedAttributes)
     {
 
-        //Either password is generated automatically without admin account verification enabled
-        $cond1 = $this->generatePassword && !$this->_module->params['enableAdminVerification'];
-        //Or the status has changed from active to inactive
-        $cond2 = isset($changedAttributes['status']) && $this->status != 0;
-        //Send email for account verification by user
-        if ($cond1 || $cond2) {
-            $model = new PasswordResetRequest(['email' => $this->email]);
-            if (!($model->validate() && $model->sendEmail())) {
-                return false;
+        if ($insert) {
+            if ($this->status == 0 && ($this->_module->params['enableAdminVerification'] == TRUE)) {
+                $model = new AccountRequestNotification(['email' => $this->email]);
+                if (!($model->validate() && $model->sendEmail())) {
+                    return false;
+                }
+            }
+            //Either password is generated automatically without admin account verification enabled
+            $cond1 = $this->generatePassword && !$this->_module->params['enableAdminVerification'];
+            //Or the status has changed from active to inactive
+            $cond2 = isset($changedAttributes['status']) && $this->status != 0;
+            //Send email for account verification by user
+            if ($cond1 || $cond2) {
+                $model = new PasswordResetRequest(['email' => $this->email]);
+                if (!($model->validate() && $model->sendEmail())) {
+                    return false;
+                }
             }
         }
         if ($this->_module->params['enableRBAC']) {
-          $this->_saveRoles($insert);
+            $this->_saveRoles($insert);
         }
+
+        //Status is false and pending admin verification
 
 
         return parent::afterSave($insert, $changedAttributes);

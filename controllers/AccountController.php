@@ -157,7 +157,7 @@ class AccountController extends Controller
 
         $model = new LoginForm();
         if ($model->load(\Yii::$app->request->post()) && $model->login()) {
-            
+
             return $this->goHome();
         } else {
             return $this->render('login', [
@@ -184,32 +184,15 @@ class AccountController extends Controller
                 $model->status = 0;
             }
         }
-
-        if ($model->load(\Yii::$app->request->post())) {
-            if($model->save()){
-                if (Yii::$app->controller->module->params['enableAdminVerification']==TRUE) {
-                    $users = User::find()->where(['enable_notification'=>1,])->all();
-                    foreach ($users as $user) {
-                        Yii::$app->mailer->compose()
-                            ->setTo([$user->email=>$user->username])
-                            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                            ->setSubject('A new account has been created. It is pending approval in the account manager dashboard')
-                            ->setTextBody('A new account has been created. It is pending approval in the account manager dashboard.')
-                            ->send();
-                    }
-                }
-
-                if (!Yii::$app->controller->module->params['enableUserVerification']?Yii::$app->getUser()->login($model):TRUE) {
-                    return $this->goHome();
-                }
-            if ($model->save() && !\Yii::$app->controller->module->params['enableUserVerification'] ? \Yii::$app->getUser()->login($model) : TRUE) {
+        if ($model->load(\Yii::$app->request->post() && $model->save())) {
+            if (!\Yii::$app->controller->module->params['enableUserVerification'] ? \Yii::$app->getUser()->login($model) : TRUE) {
                 return $this->goHome();
             }
 
+            return $this->render('signup', [
+                        'model' => $model,
+            ]);
         }
-        return $this->render('signup', [
-                    'model' => $model,
-        ]);
     }
 
 }
