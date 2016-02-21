@@ -146,8 +146,12 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
 
-        if (isset(\Yii::$app->authManager) && $this->hasAttribute('roles')) {
-            $rules[] = ['roles', 'each', 'rule' => ['range' => array_keys(\Yii::$app->authManager->getRoles())]];
+        if (isset(\Yii::$app->authManager)) {
+
+            $roles = array_keys(\Yii::$app->authManager->getRoles());
+            if (!empty($roles)) {
+                $rules[] = ['roles', 'each', 'rule' => ['in', 'range' => $roles]];
+            }
         }
         return $rules;
     }
@@ -222,7 +226,6 @@ class User extends ActiveRecord implements IdentityInterface
             return NULL;
         }
 
-        //    var_dump([($isEmail ? 'email' : 'username') => $username]);
         return static::findOne([($isEmail ? 'email' : 'username') => $username]);
     }
 
@@ -354,6 +357,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function afterSave($insert, $changedAttributes)
     {
+
         //Either password is generated automatically without admin account verification enabled
         $cond1 = $this->generatePassword && !$this->_module->params['enableAdminVerification'];
         //Or the status has changed from active to inactive
@@ -365,7 +369,9 @@ class User extends ActiveRecord implements IdentityInterface
                 return false;
             }
         }
-        if (!$this->_module->params['enableRBAC']) {
+        if ($this->_module->params['enableRBAC']) {
+            echo 'saving roles for ' . $this->email . "\n";
+
             $this->_saveRoles($insert);
         }
 
@@ -378,7 +384,6 @@ class User extends ActiveRecord implements IdentityInterface
         $out = true;
         switch (gettype($this->roles)) {
             case 'array': {
-
                     foreach ($this->roles as $roleName) {
                         $out = $out && $this->_saveRole($roleName);
                     }
@@ -389,11 +394,13 @@ class User extends ActiveRecord implements IdentityInterface
                     break;
                 }
         }
+
         return $out;
     }
 
     private function _saveRole($roleName)
     {
+
         $auth = Yii::$app->authManager;
         return $auth->assign($auth->getRole($roleName), $this->id);
     }

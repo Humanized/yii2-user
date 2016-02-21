@@ -17,6 +17,12 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
     public $defaultRoles = [];
     public $defaultStatus = 10;
 
+    public function __construct()
+    {
+
+        $this->modelClass = \Yii::$app->user->identityClass;
+    }
+
     /**
      *
      * @var array[role-name=>['permissions'=>'']] 
@@ -37,9 +43,10 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
             $user = \Yii::$app->user->identityClass;
             $model = new $user(['scenario' => $user::SCENARIO_ADMIN]);
             $model->setAttributes($record);
+    
             $model->save();
         }
-        echo 'Complete';
+        echo 'Complete' . "\n";
     }
 
     public function processRecord(&$record)
