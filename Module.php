@@ -254,6 +254,8 @@ class Module extends \yii\base\Module
         if (\Yii::$app instanceof \yii\console\Application) {
             $this->controllerNamespace = 'humanized\user\commands';
         }
+
+
         /**
          * Configure Global Module Options
          */
@@ -268,11 +270,15 @@ class Module extends \yii\base\Module
         $this->params['gridOptions'] = $this->gridOptions;
         $this->params['formOptions'] = $this->formOptions;
         $this->params['detailOptions'] = $this->detailOptions;
-
         //Permission Related initialisation (not available when CLI)
-        if (php_sapi_name() != "cli" && !\Yii::$app->user->isGuest) {
-            $this->initRoot();
-        }
+        //     var_dump(\Yii::$app->user);
+        /*
+          if (php_sapi_name() != "cli" && !\Yii::$app->user->isGuest) {
+          $this->initRoot();
+          }
+         * 
+         */
+
 
         $this->initRBAC();
         $this->initPermission();
@@ -550,27 +556,56 @@ class Module extends \yii\base\Module
     {
         $access = NULL;
         switch (\Yii::$app->controller->id) {
-            case 'account' && $action->id == 'logout': {
+            case 'admin': {
+                    $access = $this->_checkAdminPrivilege($action);
+                    break;
+                }
+            case 'account': {
+                    $access = $this->_checkAccountPrivilege($action);
+                    break;
+                }
+        }
+        return $access;
+    }
+
+    private function _checkAccountPrivilege($action)
+    {
+        $access = FALSE;
+        switch ($action->id) {
+            case 'logout': {
                     $access = TRUE;
                     break;
                 }
-            case 'account' && ($action->id == 'index' || $action->id == 'tokens' || $action->id == 'delete-token' || $action->id == 'request-password-reset'): {
+            case 'index' || 'tokens' || 'delete-token' || 'request-password-reset': {
                     $access = $this->_validateAccountParameters($action->id);
+                    if ($action->id == 'index') {
+                        $access = $access || $this->_switchPermission('view.account');
+                    }
                     break;
                 }
-            case ('admin' && $action->id == 'index'): {
+            case 'view': {
+
+                    return;
+                }
+        }
+        return $access;
+    }
+
+    private function _checkAdminPrivilege($action)
+    {
+        $access = FALSE;
+        switch ($action->id) {
+            case 'index': {
                     $access = $this->_switchPermission('access.dashboard');
                     break;
                 }
-            case ('admin' && $action->id == 'delete'): {
+            case 'delete': {
                     $access = $this->_switchPermission('delete.account');
-
                     break;
                 }
             //TODO: implement this action to segregate 
-            case ('admin' && $action->id == 'verify'): {
-
-                    $access = $this->_switchPermission('verifiy.account');
+            case ('verify'): {
+                    $access = $this->_switchPermission('verify.account');
                     break;
                 }
         }
@@ -601,7 +636,10 @@ class Module extends \yii\base\Module
     {
         $permissionGranted = FALSE;
         $permissionParam = $this->params['permissions'][$permission];
-        switch (gettype($p)) {
+        //         var_dump($this->params['permissions'][$permission]);
+
+
+        switch (gettype($permissionParam)) {
             case "boolean": {
                     $permissionGranted = $permissionParam;
                     break;
@@ -610,14 +648,15 @@ class Module extends \yii\base\Module
                     if (!$this->params['enableRBAC']) {
                         throw new \yii\base\InvalidConfigException('Yii2 User Module: enableRBAC should be set to true when using string-based variables for module permissions', 802);
                     }
-                    $grantAccess = \Yii::$app->user->can($permissionParam);
+                    $permissionGranted = \Yii::$app->user->can($permissionParam);
                     break;
                 }
             default: {
                     throw new \yii\base\InvalidConfigException('Yii2 User Module: Permission provided in wrong datatype', 100);
                 }
         }
-        return $grantAccess;
+
+        return $permissionGranted;
     }
 
 }

@@ -15,8 +15,8 @@ $this->params['breadcrumbs'][] = 'User Management';
             humanized\user\components\AccountCreateForm::widget(array_merge([
                 'model' => $model,
                 'enableRBAC' => \Yii::$app->controller->module->params['enableRBAC'],
-                'enable' => \Yii::$app->controller->module->params['permissions']['create.account'],
-                'enableStatusDropdown' => \Yii::$app->controller->module->params['enableStatusCodes'] && \Yii::$app->controller->module->params['permissions']['verify.account'],
+                'enable' => \Yii::$app->user->can(\Yii::$app->controller->module->params['permissions']['create.account']),
+                'enableStatusDropdown' => \Yii::$app->controller->module->params['enableStatusCodes'] && \Yii::$app->user->can(\Yii::$app->controller->module->params['permissions']['verify.account']),
                 'statusDropdownData' => \humanized\user\components\GUIHelper::getStatusList(),
                 'forcePasswordGeneration' => \Yii::$app->controller->module->params['enableUserVerification'],
                             ], \Yii::$app->controller->module->params['formOptions']))
@@ -31,9 +31,9 @@ $this->params['breadcrumbs'][] = 'User Management';
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
             'enable' => \Yii::$app->controller->module->params['permissions']['access.dashboard'],
-            'canViewAccount' => \Yii::$app->controller->module->params['permissions']['view.account'],
-            'canVerifyAccount' => \Yii::$app->controller->module->params['permissions']['verify.account'],
-            'canDeleteAccount' => \Yii::$app->controller->module->params['permissions']['delete.account'],
+            'canViewAccount' => Yii::$app->user->can(\Yii::$app->controller->module->params['permissions']['view.account']),
+            'canVerifyAccount' => \Yii::$app->user->can(\Yii::$app->controller->module->params['permissions']['verify.account']),
+            'canDeleteAccount' => \Yii::$app->user->can(\Yii::$app->controller->module->params['permissions']['delete.account']),
             'displayCreatedAt' => (\Yii::$app->controller->module->params['displayTimestamps'] || \Yii::$app->controller->module->params['displayCreatedAt']),
             'displayUpdatedAt' => (\Yii::$app->controller->module->params['displayTimestamps'] || \Yii::$app->controller->module->params['displayUpdatedAt']),
             'displayStatusColumn' => \Yii::$app->controller->module->params['enableStatusCodes'],

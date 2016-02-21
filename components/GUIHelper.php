@@ -19,7 +19,7 @@ class GUIHelper {
             $output[] = ['label' => 'Authentication Tokens', 'visible' => \Yii::$app->controller->module->params['enableTokenAuthentication'], 'url' => ['/user/account/tokens', 'id' => \Yii::$app->user->getId()]];
         }
 
-        $output[] = ['label' => 'User Management', 'visible' => \Yii::$app->controller->module->params['permissions']['access.dashboard'], 'url' => ['/user/admin/index']];
+        $output[] = ['label' => 'User Management', 'visible' => \Yii::$app->user->can(\Yii::$app->controller->module->params['permissions']['access.dashboard']), 'url' => ['/user/admin/index']];
         return $output;
     }
 

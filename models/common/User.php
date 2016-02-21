@@ -369,9 +369,7 @@ class User extends ActiveRecord implements IdentityInterface
             }
         }
         if ($this->_module->params['enableRBAC']) {
-            echo 'saving roles for ' . $this->email . "\n";
-
-            $this->_saveRoles($insert);
+          $this->_saveRoles($insert);
         }
 
 

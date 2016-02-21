@@ -11,7 +11,8 @@ use humanized\user\models\gui\LoginForm;
 /**
  * 
  */
-class AccountController extends Controller {
+class AccountController extends Controller
+{
     /**
      * =========================================================================
      *                              Protected Actions 
@@ -152,9 +153,11 @@ class AccountController extends Controller {
      */
     public function actionLogin()
     {
+
         $model = new LoginForm();
         if ($model->load(\Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+            
+            return $this->goHome();
         } else {
             return $this->render('login', [
                         'model' => $model,
@@ -182,7 +185,7 @@ class AccountController extends Controller {
         }
 
         if ($model->load(\Yii::$app->request->post())) {
-            if ($model->save() && !\Yii::$app->controller->module->params['enableUserVerification']?\Yii::$app->getUser()->login($model):TRUE) {
+            if ($model->save() && !\Yii::$app->controller->module->params['enableUserVerification'] ? \Yii::$app->getUser()->login($model) : TRUE) {
                 return $this->goHome();
             }
         }

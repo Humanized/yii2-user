@@ -18,7 +18,8 @@ use yii\bootstrap\Html;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class AccountDetails extends Widget {
+class AccountDetails extends Widget
+{
 
     const DISPLAY_ROLE_DEFAULT = 0;
     const DISPLAY_ROLE_ALL = 1;
@@ -86,14 +87,16 @@ class AccountDetails extends Widget {
                             $out = [];
                             while (!empty($queue)) {
                                 $current = array_shift($queue);
-                                $out[] = $current;
-                                $children = \Yii::$app->authManager->getChildren($current->name);
-                                $queue = array_merge($queue, $children);
+                                if ($current->type == \yii\rbac\Item::TYPE_ROLE) {
+                                    $out[] = $current;
+                                    $children = \Yii::$app->authManager->getChildren($current->name);
+                                    $queue = array_merge($queue, $children);
+                                }
                             }
                             return $out;
                         };
 
-                        $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback,array_merge(call_user_func_array('array_merge', array_map($callback, $direct)))))];
+                        $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback, array_merge(call_user_func_array('array_merge', array_map($callback, $direct)))))];
 
 
                         break;
@@ -118,10 +121,10 @@ class AccountDetails extends Widget {
                     'attributes' => $this->_attributes,
         ]);
 
-        if ($this->model->id != \Yii::$app->user->id && \Yii::$app->controller->module->params['enableStatusCodes'] && Yii::$app->controller->module->params['permissions']['verify.account']) {
+        if ($this->model->id != \Yii::$app->user->id && \Yii::$app->controller->module->params['enableStatusCodes'] && \Yii::$app->user->can(\Yii::$app->controller->module->params['permissions']['verify.account'])) {
 
             if ($this->canVerifyAccount) {
-                $out .= Html::a(($this->model->status == 0 ? 'Enable' : 'Disable') . ' Account', ['admin/verify', 'id' => $model->id, 'alt' => TRUE], ['class' => 'btn btn-' . ($model->status == 0 ? 'success' : 'danger')]);
+                $out .= Html::a(($this->model->status == 0 ? 'Enable' : 'Disable') . ' Account', ['admin/verify', 'id' => $this->model->id, 'alt' => TRUE], ['class' => 'btn btn-' . ($this->model->status == 0 ? 'success' : 'danger')]);
                 $out .= ' ';
             }
         }

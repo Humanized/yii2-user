@@ -18,7 +18,8 @@ use kartik\select2\Select2;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class AccountGrid extends Widget {
+class AccountGrid extends Widget
+{
 
     /**
      *
@@ -78,12 +79,18 @@ class AccountGrid extends Widget {
 
         if ($this->canViewAccount && !isset($this->viewButtonCallback)) {
             $this->_setupViewButtonCallback();
+        } else {
+            $this->actionTemplate = str_replace('{view}', '', $this->actionTemplate);
         }
         if ($this->canVerifyAccount && !isset($this->verifyButtonCallback)) {
             $this->_setupVerifyButtonCallback();
+        } else {
+            $this->actionTemplate = str_replace('{verify}', '', $this->actionTemplate);
         }
         if ($this->canDeleteAccount && !isset($this->deleteButtonCallback)) {
             $this->_setupDeleteButtonCallback();
+        } else {
+            $this->actionTemplate = str_replace('{delete}', '', $this->actionTemplate);
         }
 
         $this->_initColumns();
@@ -112,6 +119,7 @@ class AccountGrid extends Widget {
 
     private function _setupActionColumns()
     {
+
         $this->_columns[] = [
             'class' => \yii\grid\ActionColumn::className(),
             'template' => $this->actionTemplate,
@@ -126,7 +134,7 @@ class AccountGrid extends Widget {
     {
         /* Check if username column exists in corresponding AR database table */
         if ($this->searchModel->hasAttribute('username')) {
-                   $this->_columns[] = 'username';
+            $this->_columns[] = 'username';
         }
         $this->_columns[] = 'email:email';
     }
@@ -165,6 +173,7 @@ class AccountGrid extends Widget {
 
     private function _setupVerifyButtonCallback()
     {
+        echo 'really';
         $this->verifyButtonCallback = function ($url, $model, $key) {
 
             $options = [
