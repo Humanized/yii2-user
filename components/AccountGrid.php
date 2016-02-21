@@ -173,7 +173,7 @@ class AccountGrid extends Widget
 
     private function _setupVerifyButtonCallback()
     {
-        echo 'really';
+
         $this->verifyButtonCallback = function ($url, $model, $key) {
 
             $options = [

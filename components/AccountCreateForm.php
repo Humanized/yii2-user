@@ -142,12 +142,13 @@ class AccountCreateForm extends Widget
 
         if (empty($this->roleDropdownData)) {
             //Get Roles assigned to current user
-            $userRoles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
-
-            foreach ($userRoles as $role) {
-                $this->roleDropdownData[$role->name] = $role->name;
-                foreach (\Yii::$app->authManager->getChildren($role->name) as $childRole) {
-                    $this->roleDropdownData[$childRole->name] = $childRole->name;
+            $queue = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
+            while (!empty($queue)) {
+                $current = array_shift($queue);
+                if ($current->type == \yii\rbac\Item::TYPE_ROLE) {
+                    $this->roleDropdownData[$current->name] = $current->name;
+                    $children = \Yii::$app->authManager->getChildren($current->name);
+                    $queue = array_merge($queue, $children);
                 }
             }
         }
