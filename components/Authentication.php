@@ -15,7 +15,8 @@ use yii\helpers\Html;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-translation
  */
-class Authentication extends Widget {
+class Authentication extends Widget
+{
 
     public $append = FALSE;
     public $enableSignUp = FALSE;
@@ -33,9 +34,10 @@ class Authentication extends Widget {
         $out = '';
         if (\Yii::$app->user->isGuest) {
 
-
-            $out .= \yii\bootstrap\Html::a('Signup', ['/user/account/signup']);
-            $out .= $this->separator;
+            if ($this->enableSignUp) {
+                $out .= \yii\bootstrap\Html::a('Signup', ['/user/account/signup']);
+                $out .= $this->separator;
+            }
             $out .= \yii\bootstrap\Html::a('Login', ['/user/account/login']);
         } else {
             $out = '<li>'

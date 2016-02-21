@@ -220,9 +220,8 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $identity = \Yii::$app->user->identityClass;
         $isEmail = filter_var($username, FILTER_VALIDATE_EMAIL);
-
-        //BAHHHH    
-        if (!$identity->hasAttribute('username') && !$isEmail) {
+        $model = new $identity();
+        if (!$model->hasAttribute('username') && !$isEmail) {
             return NULL;
         }
 

@@ -39,11 +39,9 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
         foreach ($instance->data as $record) {
             $record['moduleName'] = 'user';
             $instance->processRecord($record);
-
             $user = \Yii::$app->user->identityClass;
             $model = new $user(['scenario' => $user::SCENARIO_ADMIN]);
             $model->setAttributes($record);
-    
             $model->save();
         }
         echo 'Complete' . "\n";
