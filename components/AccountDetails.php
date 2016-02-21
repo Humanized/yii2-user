@@ -86,14 +86,14 @@ class AccountDetails extends Widget {
                             $out = [];
                             while (!empty($queue)) {
                                 $current = array_shift($queue);
-                                $out[] = $current->name;
+                                $out[] = $current;
                                 $children = \Yii::$app->authManager->getChildren($current->name);
                                 $queue = array_merge($queue, $children);
                             }
                             return $out;
                         };
 
-                        $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_merge(call_user_func_array('array_merge', array_map($callback, $direct))))];
+                        $this->rbacAttributes[] = ['label' => 'Indirect Roles', 'format' => 'html', 'value' => implode($this->roleMapImplodeSeperator, array_map($this->roleMapCallback,array_merge(call_user_func_array('array_merge', array_map($callback, $direct)))))];
 
 
                         break;

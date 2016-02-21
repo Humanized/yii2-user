@@ -19,7 +19,8 @@ namespace humanized\user;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class Module extends \yii\base\Module {
+class Module extends \yii\base\Module
+{
 
     /**
      *
@@ -272,6 +273,8 @@ class Module extends \yii\base\Module {
         if (php_sapi_name() != "cli" && !\Yii::$app->user->isGuest) {
             $this->initRoot();
         }
+
+        $this->initRBAC();
         $this->initPermission();
     }
 
@@ -434,6 +437,43 @@ class Module extends \yii\base\Module {
         }
         //ELSE: Return FALSE (no root access)
         return FALSE;
+    }
+
+    private function initRBAC()
+    {
+        //Role coloring mechanism
+        if ($this->colorRoles) {
+            //Setup alternative role display callback 
+
+            if (!isset($this->roleColors)) {
+                //Use Humanized RBAC as default
+            }
+
+            $this->params['colorRoles'] = $this->colorRoles;
+            $this->params['roleColors'] = $this->roleColors;
+            $colors = $this->params['roleColors'];
+
+            if (!isset($this->detailOptions['roleMapCallback'])) {
+                $callback = function($role) use($colors) {
+                    $class = 'label';
+                    $style = '';
+                    $color = $colors[$role->name];
+                    if (substr($color, 0, 1) != "#" && substr($color, 0, 1) != "@") {
+                        $class .= ' ' . $color;
+                    } else {
+                        $color = str_replace("@", "", $color);
+
+                        $style = ' ' . 'style="background-color:' . $color . ';"';
+                    }
+
+                    $out = '<div class="' . $class . '"' . $style . '>';
+                    $out .= $role->name;
+                    $out .= '</div>';
+                    return $out;
+                };
+                $this->params['detailOptions']['roleMapCallback'] = $callback;
+            }
+        }
     }
 
     /**
