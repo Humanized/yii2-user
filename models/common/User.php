@@ -24,7 +24,8 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property string $password write-only password
  */
-class User extends ActiveRecord implements IdentityInterface {
+class User extends ActiveRecord implements IdentityInterface
+{
 
     /**
      * Supported model scenarios
@@ -334,17 +335,48 @@ class User extends ActiveRecord implements IdentityInterface {
      */
     public function afterSave($insert, $changedAttributes)
     {
+        //Either password is generated automatically without admin account verification enabled
         $cond1 = $this->generatePassword && !$this->_module->params['enableAdminVerification'];
+        //Or the status has changed from active to inactive
         $cond2 = isset($changedAttributes['status']) && $this->status != 0;
+        //Send email for account verification by user
         if ($cond1 || $cond2) {
             $model = new PasswordResetRequest(['email' => $this->email]);
             if (!($model->validate() && $model->sendEmail())) {
                 return false;
             }
         }
+        if (!$this->_module->params['enableRBAC']) {
+            $this->_saveRoles($insert);
+        }
 
 
         return parent::afterSave($insert, $changedAttributes);
+    }
+
+    private function _saveRoles($insert)
+    {
+        $out = true;
+        switch (gettype($this->roles)) {
+            case 'array': {
+
+                    foreach ($this->roles as $roleName) {
+                        $out = $out && $this->_saveRole($roleName);
+                    }
+                    break;
+                }
+            case 'string': {
+                    $out = $this->_saveRole($this->roles);
+                    break;
+                }
+        }
+        return $out;
+    }
+
+    private function _saveRole($roleName)
+    {
+        $auth = Yii::$app->authManager;
+        return $auth->assign($auth->getRole($roleName), $this->id);
     }
 
     private function _generatePassword()
