@@ -31,10 +31,12 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
         echo 'Loading role hierarchy from file: ' . "$class \n";
         $instance = new $class();
         foreach ($instance->data as $record) {
+            $record['moduleName'] = 'user';
             $instance->processRecord($record);
 
             $user = \Yii::$app->user->identityClass;
-            $model = new $user($record);
+            $model = new $user(['scenario' => $user::SCENARIO_ADMIN]);
+            $model->setAttributes($record);
             $model->save();
         }
         echo 'Complete';
@@ -58,6 +60,11 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
             $record['status'] = $this->defaultStatus;
         }
         return;
+    }
+
+    public function unloadCondition($record)
+    {
+        return ['email' => $record['email']];
     }
 
 }

@@ -27,6 +27,8 @@ use yii\web\IdentityInterface;
 class User extends ActiveRecord implements IdentityInterface
 {
 
+    public $moduleName = 'user';
+
     /**
      * Supported model scenarios
      */
@@ -40,6 +42,13 @@ class User extends ActiveRecord implements IdentityInterface
      */
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 10;
+
+    /*
+     * 
+     */
+
+    public $statusCodes = [];
+    public $defaultStatusCode;
 
     /**
      *
@@ -78,12 +87,20 @@ class User extends ActiveRecord implements IdentityInterface
     public function init()
     {
         parent::init();
-        $this->_module = \humanized\user\Module::getInstance();
-        if ($this->getScenario() == self::SCENARIO_ADMIN) {
-            $this->generatePassword = TRUE;
-            if ($this->_module->params['enableStatusCodes']) {
-                $this->status = $this->_module->params['defaultStatusCode'];
-            }
+        $this->_module = !$this->moduleName ? humanized\user\Module::getInstance() : \Yii::$app->getModule($this->moduleName);
+
+        //Called from inside module instance
+        if (isset($this->_module)) {
+            $this->defaultStatusCode = $this->_module->params['enableAdminVerification'] ? self::STATUS_INACTIVE : self::STATUS_ACTIVE;
+            $this->statusCodes = array_keys($this->_module->params['statusCodes']);
+        }
+
+        switch ($this->getScenario()) {
+            case self::SCENARIO_ADMIN || (self::SCENARIO_SIGNUP && $this->_module->params['enableUserVerification']): {
+                    //Password generation set to true by default on admin scenario
+                    $this->generatePassword = TRUE;
+                    break;
+                }
         }
     }
 
@@ -117,18 +134,19 @@ class User extends ActiveRecord implements IdentityInterface
             ['email', 'unique'],
             ['email', 'email'],
         ];
-        if (\Yii::$app->controller->module->params['enableUserName']) {
+        if ($this->hasAttribute('username')) {
             $rules[] = ['username', 'unique'];
         }
-        if (\Yii::$app->controller->module->params['enablePasswords']) {
-            $this->appendPasswordRules($rules);
-        }
-        if ($this->_module->params['enableStatusCodes']) {
 
-            $rules[] = ['status', 'default', 'value' => ($this->_module->params['enableUserVerification'] || $this->_module->params['enableAdminVerification']) ? self::STATUS_ACTIVE : self::STATUS_INACTIVE];
-            $rules[] = ['status', 'in', 'range' => array_keys(\Yii::$app->controller->module->params['statusCodes'])];
+        $this->appendPasswordRules($rules);
+
+        if ($this->hasAttribute('status')) {
+            $rules[] = ['status', 'default', 'value' => $this->defaultStatusCode];
+            $rules[] = ['status', 'in', 'range' => $this->statusCodes];
         }
-        if ($this->_module->params['enableRBAC']) {
+
+
+        if (isset(\Yii::$app->authManager) && $this->hasAttribute('roles')) {
             $rules[] = ['roles', 'each', 'rule' => ['range' => array_keys(\Yii::$app->authManager->getRoles())]];
         }
         return $rules;
@@ -196,11 +214,11 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findByUsername($username)
     {
-
+        $identity = \Yii::$app->user->identityClass;
         $isEmail = filter_var($username, FILTER_VALIDATE_EMAIL);
 
         //BAHHHH    
-        if (!\humanized\user\Module::getInstance()->params['enableUserName'] && !$isEmail) {
+        if (!$identity->hasAttribute('username') && !$isEmail) {
             return NULL;
         }
 
@@ -320,6 +338,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function beforeValidate()
     {
+
         if ($this->scenario == self::SCENARIO_ADMIN || $this->scenario == self::SCENARIO_SIGNUP) {
             $this->generateAuthKey();
             $this->_generatePassword();
