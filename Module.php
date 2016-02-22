@@ -239,7 +239,7 @@ class Module extends \yii\base\Module
      * @since 0.1
      * @var array<string> List of actions when guest
      */
-    private $_public = ['login', 'request-password-reset','reset-password'];
+    private $_public = ['login', 'request-password-reset', 'reset-password'];
 
     /**
      * Initialisation of module parameters
@@ -614,7 +614,9 @@ class Module extends \yii\base\Module
 
     private function _validateAccountParameters($action)
     {
-
+        if ($action != 'reset-password') {
+            return true;
+        }
         $id = \yii::$app->getRequest()->getQueryParams()['id'];
         $userId = \Yii::$app->user->id;
         if (!isset($id)) {
