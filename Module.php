@@ -239,7 +239,7 @@ class Module extends \yii\base\Module
      * @since 0.1
      * @var array<string> List of actions when guest
      */
-    private $_public = ['login', 'request-password-reset'];
+    private $_public = ['login', 'request-password-reset','reset-password'];
 
     /**
      * Initialisation of module parameters
@@ -614,11 +614,14 @@ class Module extends \yii\base\Module
 
     private function _validateAccountParameters($action)
     {
+
         $id = \yii::$app->getRequest()->getQueryParams()['id'];
         $userId = \Yii::$app->user->id;
         if (!isset($id)) {
             return FALSE;
         }
+
+
         //User ID parameter is set and matches current session account-id
         //Only users can delete their own tokens (for now)
         if ($action != 'delete-token') {
