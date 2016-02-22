@@ -34,7 +34,7 @@ class AdminController extends Controller
         }
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             //reset model on success
-            $model = new User(['scenario' => User::SCENARIO_ADMIN]);
+            $model = new $identityClass(['scenario' => $identityClass::SCENARIO_ADMIN]);
         }
         //Account Search Model
         $searchModel = new UserSearch();
