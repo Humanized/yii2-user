@@ -617,7 +617,7 @@ class Module extends \yii\base\Module
         if ($action == 'reset-password') {
             return true;
         }
-        $id = \yii::$app->getRequest()->getQueryParams()['id'];
+        $id = \yii::$app->getRequest()->getQueryParam('id');
         $userId = \Yii::$app->user->id;
         if (!isset($id)) {
             return FALSE;

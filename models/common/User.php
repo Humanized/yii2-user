@@ -23,6 +23,10 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ * @property string $last_login
+ * @property string $login_count
+ * @property string $session_average
+ * @property string $session_total
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -191,6 +195,32 @@ class User extends ActiveRecord implements IdentityInterface
         }
         $scenarios[self::SCENARIO_PWDRST] = [];
         return $scenarios;
+    }
+
+    public function updateLastLogout()
+    {
+        $previousLastLogin = $this->last_login?:date('Y-m-d H:i:s');
+        $currentLastLogin = $this->last_login = date('Y-m-d H:i:s');
+
+        $previousLastLogin = strtotime($previousLastLogin);
+        $currentLastLogin = strtotime($currentLastLogin);
+        $deltaTime = $currentLastLogin - $previousLastLogin;
+        $this->session_total+=$deltaTime;
+        $this->session_average = $this->session_total/$this->login_count;
+        $this->save(false);
+    }
+    public function updateLastLogin()
+    {
+        $previousLastLogin = $this->last_login?:date('Y-m-d H:i:s');
+        $currentLastLogin = $this->last_login = date('Y-m-d H:i:s');
+        $this->login_count++;
+
+        $previousLastLogin = strtotime($previousLastLogin);
+        $currentLastLogin = strtotime($currentLastLogin);
+        $deltaTime = $currentLastLogin - $previousLastLogin;
+        $this->session_total+=$deltaTime;
+        $this->session_average = $this->session_total/$this->login_count;
+        $this->save(false);
     }
 
     /**

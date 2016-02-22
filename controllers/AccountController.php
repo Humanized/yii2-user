@@ -29,6 +29,8 @@ class AccountController extends Controller
      */
     public function actionLogout()
     {
+        if(isset(Yii::$app->user->identity) && Yii::$app->user->identity)
+            Yii::$app->user->identity->updateLastLogout();
         \Yii::$app->user->logout();
         return $this->goHome();
     }
@@ -155,10 +157,8 @@ class AccountController extends Controller
      */
     public function actionLogin()
     {
-
         $model = new LoginForm();
         if ($model->load(\Yii::$app->request->post()) && $model->login()) {
-
             return $this->goHome();
         } else {
             return $this->render('login', [
@@ -185,7 +185,7 @@ class AccountController extends Controller
                 $model->status = 0;
             }
         }
-        if ($model->load(\Yii::$app->request->post() && $model->save())) {
+        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
 
             if(Yii::$app->controller->module->params['enableAdminVerification']){
                 $users = User::find()->where(['enable_notification'=>1,])->all();
