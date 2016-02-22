@@ -614,7 +614,7 @@ class Module extends \yii\base\Module
 
     private function _validateAccountParameters($action)
     {
-        if ($action != 'reset-password') {
+        if ($action == 'reset-password') {
             return true;
         }
         $id = \yii::$app->getRequest()->getQueryParams()['id'];
@@ -624,7 +624,7 @@ class Module extends \yii\base\Module
         }
 
 
-        //User ID parameter is set and matches current session account-id
+            //User ID parameter is set and matches current session account-id
         //Only users can delete their own tokens (for now)
         if ($action != 'delete-token') {
             return $userId == $id;
