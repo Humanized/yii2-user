@@ -3,13 +3,13 @@
 namespace humanized\user\controllers;
 
 use yii\web\Controller;
-use humanized\user\models\common\User;
 use humanized\user\models\common\UserSearch;
 
 /**
  * 
  */
-class AdminController extends Controller {
+class AdminController extends Controller
+{
     /**
      * =========================================================================
      *                              Protected Actions 
@@ -25,8 +25,10 @@ class AdminController extends Controller {
      */
     public function actionIndex()
     {
+        $identityClass = \Yii::$app->user->identityClass;
+
         //Account Creation Model (admin scenario)
-        $model = new User(['scenario' => User::SCENARIO_ADMIN]);
+        $model = new $identityClass(['scenario' => $identityClass::SCENARIO_ADMIN]);
         if (\Yii::$app->controller->module->params['enableAdminVerification'] && !\Yii::$app->controller->module->params['permissions']['verify.account']) {
             $model->status = 0;
         }
@@ -56,7 +58,9 @@ class AdminController extends Controller {
      */
     public function actionDelete($id)
     {
-        $user = User::findOne(['id' => $id]);
+
+        $identityClass = \Yii::$app->user->identityClass;
+        $user = $identityClass::findOne(['id' => $id]);
         if (isset($user)) {
             $user->delete();
         }
@@ -73,7 +77,8 @@ class AdminController extends Controller {
      */
     public function actionVerify($id, $alt = FALSE)
     {
-        $user = User::findOne(['id' => $id]);
+        $identityClass = \Yii::$app->user->identityClass;
+        $user = $identityClass::findOne(['id' => $id]);
         if (isset($user)) {
             if ((int) $user->status == 0) {
                 $user->status = 10;

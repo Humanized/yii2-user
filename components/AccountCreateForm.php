@@ -188,7 +188,7 @@ class AccountCreateForm extends Widget
             $setupFn = '_setup' . ucfirst($caller) . 'Fields';
             $this->$setupFn();
             if (isset($this->extraAttributesAfter[$caller])) {
-                $this->extraAttributesBefore[$caller]($this->model, $this->form);
+                $this->extraAttributesAfter[$caller]($this->model, $this->form);
             }
         }, $fields[1]);
     }
