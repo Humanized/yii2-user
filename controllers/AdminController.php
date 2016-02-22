@@ -4,6 +4,7 @@ namespace humanized\user\controllers;
 
 use yii\web\Controller;
 use humanized\user\models\common\UserSearch;
+use humanized\user\models\common\PasswordResetRequest;
 
 /**
  * 
