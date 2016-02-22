@@ -80,8 +80,12 @@ class AdminController extends Controller
         $identityClass = \Yii::$app->user->identityClass;
         $user = $identityClass::findOne(['id' => $id]);
         if (isset($user)) {
-            if ((int) $user->status == 0) {
+            if ($user->status == 0) {
                 $user->status = 10;
+                $model = new PasswordResetRequest();
+                if (isset($id) ? $model->loadMail($id) : $model->load(\Yii::$app->request->post()) && $model->validate()) {
+                    $model->sendEmail();
+                }
             } else {
                 $user->status = 0;
             }
