@@ -8,8 +8,7 @@ use humanized\user\models\common\User;
  * Role Hierarchy Table
  * Data loader for simple linear rbac hierarchies
  */
-class AccountTable extends \humanized\clihelpers\components\DataTable
-{
+class AccountTable extends \humanized\clihelpers\components\DataTable {
 
     public $debugPassword = '#!@dmin201x';
     public $debug = FALSE;
@@ -19,7 +18,6 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
 
     public function __construct()
     {
-
         $this->modelClass = \Yii::$app->user->identityClass;
     }
 
@@ -27,7 +25,7 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
      *
      * @var array[role-name=>['permissions'=>'']] 
      */
-    public $data = [
+    public $records = [
     ];
 
     public static function load()
@@ -36,11 +34,10 @@ class AccountTable extends \humanized\clihelpers\components\DataTable
         $class = get_called_class();
         echo 'Loading role hierarchy from file: ' . "$class \n";
         $instance = new $class();
-        foreach ($instance->data as $record) {
-            $record['moduleName'] = 'user';
-            $instance->processRecord($record);
-            $user = \Yii::$app->user->identityClass;
-            $model = new $user(['scenario' => $user::SCENARIO_ADMIN]);
+        $user = \Yii::$app->user->identityClass;
+        foreach ($instance->records as $record) {
+            $instance->processRecord(array_merge(['moduleName' => 'user'], $record));
+            $model = new $user();
             $model->setAttributes($record);
             $model->save();
         }
