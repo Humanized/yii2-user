@@ -30,7 +30,7 @@ class AccountController extends Controller
     public function actionLogout()
     {
         if(isset(Yii::$app->user->identity) && Yii::$app->user->identity)
-            Yii::$app->user->identity->updateLastLogout();
+          //  Yii::$app->user->identity->updateLastLogout();
         \Yii::$app->user->logout();
         return $this->goHome();
     }
