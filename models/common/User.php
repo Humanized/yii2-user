@@ -97,7 +97,6 @@ class User extends ActiveRecord implements IdentityInterface
         if (isset($this->_module)) {
             $this->defaultStatusCode = $this->_module->params['enableAdminVerification'] ? self::STATUS_INACTIVE : self::STATUS_ACTIVE;
             $this->statusCodes = array_keys($this->_module->params['statusCodes']);
-   
         }
 
         switch ($this->getScenario()) {
@@ -199,28 +198,35 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function updateLastLogout()
     {
-        $previousLastLogin = $this->last_login?:date('Y-m-d H:i:s');
-        $currentLastLogin = $this->last_login = date('Y-m-d H:i:s');
+        /*
+          $previousLastLogin = $this->last_login?:date('Y-m-d H:i:s');
+          $currentLastLogin = $this->last_login = date('Y-m-d H:i:s');
 
-        $previousLastLogin = strtotime($previousLastLogin);
-        $currentLastLogin = strtotime($currentLastLogin);
-        $deltaTime = $currentLastLogin - $previousLastLogin;
-        $this->session_total+=$deltaTime;
-        $this->session_average = $this->session_total/$this->login_count;
-        $this->save(false);
+          $previousLastLogin = strtotime($previousLastLogin);
+          $currentLastLogin = strtotime($currentLastLogin);
+          $deltaTime = $currentLastLogin - $previousLastLogin;
+          $this->session_total+=$deltaTime;
+          $this->session_average = $this->session_total/$this->login_count;
+          $this->save(false);
+         * 
+         */
     }
+
     public function updateLastLogin()
     {
-        $previousLastLogin = $this->last_login?:date('Y-m-d H:i:s');
-        $currentLastLogin = $this->last_login = date('Y-m-d H:i:s');
-        $this->login_count++;
+        /*
+          $previousLastLogin = $this->last_login?:date('Y-m-d H:i:s');
+          $currentLastLogin = $this->last_login = date('Y-m-d H:i:s');
+          $this->login_count++;
 
-        $previousLastLogin = strtotime($previousLastLogin);
-        $currentLastLogin = strtotime($currentLastLogin);
-        $deltaTime = $currentLastLogin - $previousLastLogin;
-        $this->session_total+=$deltaTime;
-        $this->session_average = $this->session_total/$this->login_count;
-        $this->save(false);
+          $previousLastLogin = strtotime($previousLastLogin);
+          $currentLastLogin = strtotime($currentLastLogin);
+          $deltaTime = $currentLastLogin - $previousLastLogin;
+          $this->session_total+=$deltaTime;
+          $this->session_average = $this->session_total/$this->login_count;
+          $this->save(false);
+         * 
+         */
     }
 
     /**
@@ -402,7 +408,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         if ($insert) {
             if ($this->status == self::STATUS_INACTIVE && ($this->_module->params['enableAdminVerification'] == TRUE)) {
-                
+
                 $model = new AccountRequestNotification(['email' => $this->email]);
                 if (!($model->validate() && $model->sendEmail())) {
                     return false;
