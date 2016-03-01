@@ -6,7 +6,7 @@ use yii\base\Widget;
 use yii\helpers\Html;
 
 /**
- * LanguagePicker Widget for Yii2 - By Humanized
+ * Authentication Widget for Yii2 - By Humanized
  * 
  * This widget allows the user to set the application using the configuration provided by the Module. 
  * 

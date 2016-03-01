@@ -29,13 +29,13 @@ class AdminController extends Controller
         $identityClass = \Yii::$app->user->identityClass;
 
         //Account Creation Model (admin scenario)
-        $model = new $identityClass(['scenario' => $identityClass::SCENARIO_ADMIN]);
+        $model = new $identityClass(['scenario' => $identityClass::SCENARIO_DEFAULT]);
         if (\Yii::$app->controller->module->params['enableAdminVerification'] && !\Yii::$app->controller->module->params['permissions']['verify.account']) {
             $model->status = 0;
         }
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             //reset model on success
-            $model = new $identityClass(['scenario' => $identityClass::SCENARIO_ADMIN]);
+            $model = new $identityClass(['scenario' => $identityClass::SCENARIO_DEFAULT]);
         }
         //Account Search Model
         $searchModel = new UserSearch();

@@ -36,7 +36,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Supported model scenarios
      */
-    const SCENARIO_ADMIN = 'admin';
+    const SCENARIO_DEFAULT = 'default';
     const SCENARIO_LOGIN = 'login';
     const SCENARIO_SIGNUP = 'signup';
     const SCENARIO_PWDRST = 'password-reset';
@@ -100,7 +100,7 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         switch ($this->getScenario()) {
-            case self::SCENARIO_ADMIN || (self::SCENARIO_SIGNUP && $this->_module->params['enableUserVerification']): {
+            case self::SCENARIO_DEFAULT || (self::SCENARIO_SIGNUP && $this->_module->params['enableUserVerification']): {
                     //Password generation set to true by default on admin scenario
                     $this->generatePassword = TRUE;
                     break;
@@ -169,14 +169,14 @@ class User extends ActiveRecord implements IdentityInterface
                                     return $('#generate-password').checked==false;
                                 }";
         $rules = array_merge($rules, [
-            ['generatePassword', 'required', 'on' => [self::SCENARIO_ADMIN]],
+            ['generatePassword', 'required', 'on' => [self::SCENARIO_DEFAULT]],
             ['password', 'string', 'min' => 8],
             ['password', 'required',
                 'when' => $when,
                 'whenClient' => $whenClient
             ],
             ['password_confirm', 'required',
-                'on' => [self::SCENARIO_SIGNUP, self::SCENARIO_ADMIN],
+                'on' => [self::SCENARIO_SIGNUP, self::SCENARIO_DEFAULT],
                 'when' => $when,
                 'whenClient' => $whenClient
             ],
@@ -390,7 +390,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function beforeValidate()
     {
 
-        if ($this->scenario == self::SCENARIO_ADMIN || $this->scenario == self::SCENARIO_SIGNUP) {
+        if ($this->scenario == self::SCENARIO_DEFAULT || $this->scenario == self::SCENARIO_SIGNUP) {
             $this->generateAuthKey();
             $this->_generatePassword();
         }

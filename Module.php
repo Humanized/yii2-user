@@ -19,8 +19,7 @@ namespace humanized\user;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class Module extends \yii\base\Module
-{
+class Module extends \yii\base\Module {
 
     /**
      *
@@ -517,29 +516,32 @@ class Module extends \yii\base\Module
      */
     public function beforeAction($action)
     {
-        //Access Granted By Default
-        //Default Error Message
-        $error = 'Page not found.';
+        if (php_sapi_name() != "cli") {
 
-        //CASE #1: Public Access (Guest Access)
-        if (\Yii::$app->user->isGuest) {
-            if (in_array($action->id, $this->_public)) {
-                return parent::beforeAction($action);
-            } else {
+            //Access Granted By Default
+            //Default Error Message
+            $error = 'Page not found.';
+
+            //CASE #1: Public Access (Guest Access)
+            if (\Yii::$app->user->isGuest) {
+                if (in_array($action->id, $this->_public)) {
+                    return parent::beforeAction($action);
+                } else {
+                    throw new \yii\web\NotFoundHttpException($error);
+                }
+            }
+            //CASE #2: Configurable Interfaces
+            if (($action->id == 'tokens' || ($action->id == 'delete-token')) && !$this->params['enableTokenAuthentication']) {
                 throw new \yii\web\NotFoundHttpException($error);
             }
-        }
-        //CASE #2: Configurable Interfaces
-        if (($action->id == 'tokens' || ($action->id == 'delete-token')) && !$this->params['enableTokenAuthentication']) {
-            throw new \yii\web\NotFoundHttpException($error);
-        }
 
-        //CASE #3: Permission-based Access
-        if (!$this->_isRoot) {
-            //Not Root Access, so see if particular 
-            $accessGranted = $this->_checkPrivilege($action);
-            if (!$accessGranted) {
-                throw new \yii\web\NotFoundHttpException($error);
+            //CASE #3: Permission-based Access
+            if (!$this->_isRoot) {
+                //Not Root Access, so see if particular 
+                $accessGranted = $this->_checkPrivilege($action);
+                if (!$accessGranted) {
+                    throw new \yii\web\NotFoundHttpException($error);
+                }
             }
         }
         return parent::beforeAction($action);
@@ -624,7 +626,7 @@ class Module extends \yii\base\Module
         }
 
 
-            //User ID parameter is set and matches current session account-id
+        //User ID parameter is set and matches current session account-id
         //Only users can delete their own tokens (for now)
         if ($action != 'delete-token') {
             return $userId == $id;

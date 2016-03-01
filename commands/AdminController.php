@@ -10,15 +10,41 @@ use yii\helpers\Console;
 /**
  * A CLI allowing basic Yii2 user administration functions.
  * 
- * Supported commands:
+ * The interface requires that proper configuration of the user component to reference the identity class for user management operations 
+ * along with the optional setup of the authmanager component to allow user role assignment
  * 
- * > user/admin/create <email:required> <uname:optional>
+ * Accounts are referenced, through a unique email address or username.
  * 
- * > user/admin/delete <email:required>
+ * The email address is required. The username is considered optional, and following cases are to be considered:
  * 
- * > user/admin/send-password-reset-link <email:required>
+ * <ul>
+ * <li>Identity Model does not have a username attribute: email address is used to reference user-account </li>
+ * <li>Identity Model has username attribute: If unset, the email address will be used as username. No username to reference accounts</li>
+ * </ul>
  * 
- * > user/admin/send-token-generation-link <email:required>
+ * As such, all commands provided take following parameters:
+ *  
+ * <table>
+ * <tr><td>email</td><td>Account email specification</td></tr>
+ * <tr><td>username</td><td>Account username specification</td></tr>
+ * </table>
+ * 
+ * 
+ * Using general configuration specified above, i.e. the use of any class implementing the IdentityInterface, following commands are supported:
+ * 
+ * <table>
+ * <tr><td><module-name>/admin/create</td><td>role-name(optional)</td><td></td></tr>
+ * <tr><td><module-name>/admin/delete</td><td></td><td></td></tr>
+ * <tr><td><module-name>/admin/set-status</td><td>status-code(required)</td><td></td></tr>
+ * </table>
+ * 
+ * When the identity class is instance of, or inherits methods provided by the humanized/user/common/User model, additional commands are available
+ * 
+ * <table>
+ * <tr><td><module-name>/admin/send-password-reset-link</td><td></td><td></td></tr>
+ * <tr><td><module-name>/admin/activate-account</td><td></td><td></td></tr>
+ * <tr><td><module-name>/admin/disactivate-account</td><td></td><td></td></tr>
+ * </table>
  * 
  * 
  * @name User Administration CLI
@@ -29,22 +55,34 @@ use yii\helpers\Console;
  */
 class AdminController extends Controller {
 
-    private $_model;
-    private $_userClass;
-    private $_findUser;
+    public $role;
+    public $email;
+    public $username;
+    private $_user;
+    private $_auth;
 
     public function __construct($id, $module, $config = array())
     {
         parent::__construct($id, $module, $config);
-        $this->_userClass = $module->params['identityClass'];
-        $this->_findUser = $module->params['fnUser'];
+        //Require existence of identityClass and private object instantiation
+        $userClass = \Yii::$app->user->identityClass;
+        //Throw error if unset
+        $this->_user = new $userClass();
+        //Optional existence of authManager class and private object instantiation
+        if (isset(\Yii::$app->authManager)) {
+            $this->_auth = \Yii::$app->authManager;
+        }
     }
 
     private function findModel($user)
     {
-        $userClass = $this->_userClass;
-        $fn = $this->_findUser;
-        return $userClass::$fn($user);
+        $model = $this->_user;
+        $isEmail = filter_var($user, FILTER_VALIDATE_EMAIL);
+
+        if (!$model->hasAttribute('username') && !$isEmail) {
+            return NULL;
+        }
+        return !$model::findOne([($isEmail ? 'email' : 'username') => $user]);
     }
 
     public function actionIndex()
@@ -129,15 +167,14 @@ class AdminController extends Controller {
             return $this->_exitCode;
         }
 
-
         //Prompt for account password
         $sendMail = $this->_prompt();
         //Save the model
         try {
-            if (!$this->_model->save()) {
-                \yii\helpers\VarDumper::dump($this->_model->getErrors());
+            if (!$this->_user->save()) {
+                \yii\helpers\VarDumper::dump($this->_user->getErrors());
                 $this->_exitCode = 101;
-                $this->_msg = 'Model Save ERROR ';
+                $this->_msg = 'Model Save ERROR';
             }
         } catch (\Exception $e) {
             $this->_exitCode = $e->getCode();
@@ -163,19 +200,13 @@ class AdminController extends Controller {
      */
     private function _setupModel($email, $user)
     {
-        $config = [
-            'scenario' => User::SCENARIO_ADMIN,
-            'email' => $email,
-        ];
-        if ($this->module->params['enableUserName']) {
-            $config['username'] = (isset($user) ? $user : $email);
-        }
-        $this->_model = new User($config);
-        if (!$this->_model->validate(['email'])) {
+        $this->_user->email = $email;
+        if (!$this->_user->validate(['email'])) {
             $this->_msg = $this->_model->errors['email'][0];
             $this->_exitCode = 101;
         }
-        if ($this->module->params['enableUserName']) {
+        if ($this->_exitCode === 0 && $this->_user->hasAttribute('username')) {
+            $this->_user->username = (isset($user) ? $user : $email);
             if (!$this->_model->validate(['username'])) {
                 $this->_msg = $this->_model->errors['username'][0];
                 $this->_exitCode = 102;
