@@ -19,7 +19,8 @@ namespace humanized\user;
  * @author Jeffrey Geyssens <jeffrey@humanized.be>
  * @package yii2-user
  */
-class Module extends \yii\base\Module {
+class Module extends \yii\base\Module
+{
 
     /**
      *
@@ -526,9 +527,8 @@ class Module extends \yii\base\Module {
             if (\Yii::$app->user->isGuest) {
                 if (in_array($action->id, $this->_public)) {
                     return parent::beforeAction($action);
-                } else {
-                    throw new \yii\web\NotFoundHttpException($error);
                 }
+                return $this->redirect(\Yii::$app->getUser()->loginUrl);
             }
             //CASE #2: Configurable Interfaces
             if (($action->id == 'tokens' || ($action->id == 'delete-token')) && !$this->params['enableTokenAuthentication']) {
