@@ -8,8 +8,10 @@ use humanized\user\models\common\User;
  * Role Hierarchy Table
  * Data loader for simple linear rbac hierarchies
  */
-class AccountTable extends \humanized\clihelpers\components\DataTable {
+class AccountTable extends \humanized\clihelpers\components\DataTable
+{
 
+    public $moduleName = 'user';
     public $debugPassword = '#!@dmin201x';
     public $debug = FALSE;
     public $modelClass = NULL;
@@ -36,9 +38,10 @@ class AccountTable extends \humanized\clihelpers\components\DataTable {
         $instance = new $class();
         $user = \Yii::$app->user->identityClass;
         foreach ($instance->records as $record) {
-            $instance->processRecord(array_merge(['moduleName' => 'user'], $record));
+            $record = $instance->processRecord($record);
             $model = new $user();
             $model->setAttributes($record);
+            $model->generatePassword = FALSE;
             $model->save();
         }
         echo 'Complete' . "\n";
@@ -46,8 +49,8 @@ class AccountTable extends \humanized\clihelpers\components\DataTable {
 
     public function processRecord(&$record)
     {
+        $record['moduleName'] = $this->moduleName;
         if ($this->debug) {
-            $record['generatePassword'] = FALSE;
             if (!isset($record['password'])) {
                 $record['password'] = $this->debugPassword;
             }
@@ -60,7 +63,7 @@ class AccountTable extends \humanized\clihelpers\components\DataTable {
         if (!isset($record['status'])) {
             $record['status'] = $this->defaultStatus;
         }
-        return;
+        return $record;
     }
 
     public function unloadCondition($record)
