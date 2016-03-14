@@ -528,7 +528,9 @@ class Module extends \yii\base\Module
                 if (in_array($action->id, $this->_public)) {
                     return parent::beforeAction($action);
                 }
-                return $this->redirect(\Yii::$app->getUser()->loginUrl);
+                
+               $this->redirect(Yii::app()->createUrl('/user/account/login'));
+
             }
             //CASE #2: Configurable Interfaces
             if (($action->id == 'tokens' || ($action->id == 'delete-token')) && !$this->params['enableTokenAuthentication']) {
