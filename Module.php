@@ -495,6 +495,7 @@ class Module extends \yii\base\Module
             'delete.account' => $this->_isRoot ? TRUE : FALSE,
             'view.account' => $this->_isRoot ? TRUE : FALSE,
             'verify.account' => $this->_isRoot ? TRUE : FALSE,
+            'manage.tokens' => $this->_isRoot ? TRUE : FALSE,
         ];
         //Overwrite default values with RBAC permissions when not root
         if (!$this->_isRoot) {
@@ -528,9 +529,8 @@ class Module extends \yii\base\Module
                 if (in_array($action->id, $this->_public)) {
                     return parent::beforeAction($action);
                 }
-                
-               $this->redirect(Yii::app()->createUrl('/user/account/login'));
 
+                $this->redirect(Yii::app()->createUrl('/user/account/login'));
             }
             //CASE #2: Configurable Interfaces
             if (($action->id == 'tokens' || ($action->id == 'delete-token')) && !$this->params['enableTokenAuthentication']) {
@@ -580,18 +580,22 @@ class Module extends \yii\base\Module
                     $access = TRUE;
                     break;
                 }
-            case 'index' || 'tokens' || 'delete-token' || 'request-password-reset': {
+            case 'request-password-reset': {
                     $access = $this->_validateAccountParameters($action->id);
-                    if ($action->id == 'index') {
-                        $access = $access || $this->_switchPermission('view.account');
-                    }
                     break;
                 }
-            case 'view': {
-
-                    return;
+            case 'index': {
+                    //Own account or permission to view other accounts 
+                    $access = $this->_validateAccountParameters($action->id) || $this->_switchPermission('view.account');
                 }
+                break;
+
+            case 'tokens' || 'delete-token': {
+                    $access = $this->_validateAccountParameters($action->id) || $this->_switchPermission('manage.tokens');
+                }
+                break;
         }
+
         return $access;
     }
 
