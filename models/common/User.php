@@ -391,6 +391,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
 
         if ($this->scenario == self::SCENARIO_DEFAULT || $this->scenario == self::SCENARIO_SIGNUP) {
+            echo 'HEEEREEE';
             $this->generateAuthKey();
             $this->_generatePassword();
         }
@@ -466,6 +467,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $passwd = $this->password;
         if ($this->scenario == self::SCENARIO_SIGNUP) {
+      
             $this->generatePassword = FALSE;
         }
         if ($this->generatePassword) {

@@ -203,6 +203,7 @@ class AdminController extends Controller
      */
     private function _setupModel($email, $user)
     {
+        $this->_user->scenario = 'signup';
         $this->_user->email = $email;
         if (!$this->_user->validate(['email'])) {
             $this->_msg = $this->_user->errors['email'][0];
@@ -210,12 +211,12 @@ class AdminController extends Controller
         }
         if ($this->_exitCode === 0 && $this->_user->hasAttribute('username')) {
             $this->_user->username = (isset($user) ? $user : $email);
-            if (!$this->_uer->validate(['username'])) {
+            if (!$this->_user->validate(['username'])) {
                 $this->_msg = $this->_user->errors['username'][0];
                 $this->_exitCode = 102;
             }
         }
-        $this->_user->scenario = 'signup';
+
         $this->_user->status = 10;
         return 0 === $this->_exitCode;
     }
