@@ -38,6 +38,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     const SCENARIO_DEFAULT = 'default';
     const SCENARIO_LOGIN = 'login';
+    
     const SCENARIO_SIGNUP = 'signup';
     const SCENARIO_PWDRST = 'password-reset';
 
@@ -101,6 +102,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         switch ($this->getScenario()) {
             case self::SCENARIO_DEFAULT || (self::SCENARIO_SIGNUP && $this->_module->params['enableUserVerification']): {
+                  
                     //Password generation set to true by default on admin scenario
                     $this->generatePassword = TRUE;
                     break;
@@ -391,7 +393,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
 
         if ($this->scenario == self::SCENARIO_DEFAULT || $this->scenario == self::SCENARIO_SIGNUP) {
-            echo 'HEEEREEE';
             $this->generateAuthKey();
             $this->_generatePassword();
         }
@@ -467,7 +468,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $passwd = $this->password;
         if ($this->scenario == self::SCENARIO_SIGNUP) {
-      
+
             $this->generatePassword = FALSE;
         }
         if ($this->generatePassword) {

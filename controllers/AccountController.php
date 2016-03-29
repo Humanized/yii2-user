@@ -29,9 +29,9 @@ class AccountController extends Controller
      */
     public function actionLogout()
     {
-        if(isset(Yii::$app->user->identity) && Yii::$app->user->identity)
-          //  Yii::$app->user->identity->updateLastLogout();
-        \Yii::$app->user->logout();
+        if (isset(Yii::$app->user->identity) && Yii::$app->user->identity)
+        //  Yii::$app->user->identity->updateLastLogout();
+            \Yii::$app->user->logout();
         return $this->goHome();
     }
 
@@ -189,10 +189,9 @@ class AccountController extends Controller
             if (!\Yii::$app->controller->module->params['enableUserVerification'] ? \Yii::$app->getUser()->login($model) : TRUE) {
                 return $this->goHome();
             }
-
         }
         return $this->render('signup', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 

@@ -68,7 +68,8 @@ class AdminController extends Controller
         //Require existence of identityClass and private object instantiation
         $userClass = \Yii::$app->user->identityClass;
         //Throw error if unset
-        $this->_user = new $userClass();
+        //Scenario sign-up (temporary) - status active
+        $this->_user = new $userClass(['scenario' => User::SCENARIO_SIGNUP,'status'=>10]);
         //Optional existence of authManager class and private object instantiation
         if (isset(\Yii::$app->authManager)) {
             $this->_auth = \Yii::$app->authManager;
@@ -167,7 +168,7 @@ class AdminController extends Controller
         if (!$this->_setupModel($email, $user)) {
             return $this->_exitCode;
         }
-
+        //   echo ($this->_user->generatePassword?'Naay':'Yaay');
         //Prompt for account password
         $sendMail = $this->_prompt();
         //Save the model
