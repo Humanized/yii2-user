@@ -172,6 +172,8 @@ class AdminController extends Controller
         $sendMail = $this->_prompt();
         //Save the model
         try {
+            //Set status to active
+            $this->_user->status = 10;
             if (!$this->_user->save()) {
                 \yii\helpers\VarDumper::dump($this->_user->getErrors());
                 $this->_exitCode = 101;
