@@ -215,6 +215,8 @@ class AdminController extends Controller
                 $this->_exitCode = 102;
             }
         }
+        $this->_user->scenario = 'signup';
+        $this->_user->status = 10;
         return 0 === $this->_exitCode;
     }
 
