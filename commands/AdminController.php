@@ -53,7 +53,8 @@ use yii\helpers\Console;
  * @package yii2-user
  *
  */
-class AdminController extends Controller {
+class AdminController extends Controller
+{
 
     public $role;
     public $email;
@@ -202,17 +203,16 @@ class AdminController extends Controller {
     {
         $this->_user->email = $email;
         if (!$this->_user->validate(['email'])) {
-            $this->_msg = $this->_model->errors['email'][0];
+            $this->_msg = $this->_user->errors['email'][0];
             $this->_exitCode = 101;
         }
         if ($this->_exitCode === 0 && $this->_user->hasAttribute('username')) {
             $this->_user->username = (isset($user) ? $user : $email);
-            if (!$this->_model->validate(['username'])) {
-                $this->_msg = $this->_model->errors['username'][0];
+            if (!$this->_uer->validate(['username'])) {
+                $this->_msg = $this->_user->errors['username'][0];
                 $this->_exitCode = 102;
             }
         }
-
         return 0 === $this->_exitCode;
     }
 
@@ -230,19 +230,19 @@ class AdminController extends Controller {
         $this->showInput();
         //Restart when passwords do not match OR rejected confirmation
         if (($passwd !== $confirm) || ($passwd === "" && !$this->confirm("\nGenerate password and send confirmation mail?"))) {
-            return $this->promptPassword();
+            return $this->_promptPassword();
         }
 
         //Autogenerate password
         if ($passwd === "") {
-            $this->_model->generatePassword = TRUE;
+            $this->_user->generatePassword = TRUE;
         }
-        if (!$this->_model->generatePassword) {
-            $this->_model->password = $passwd;
-            $this->_model->password_confirm = $confirm;
+        if (!$this->_user->generatePassword) {
+            $this->_user->password = $passwd;
+            $this->_user->password_confirm = $confirm;
         }
 
-        return $this->_model->generatePassword;
+        return $this->_user->generatePassword;
     }
 
     /**

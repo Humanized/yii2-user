@@ -34,14 +34,13 @@ class m130524_201442_user_init extends Migration
             'auth_key' => $this->string(32)->notNull(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
+            'enable_notifications' => $this->boolean()->notNull()->defaultValue(FALSE),
         ];
 
         if ($this->_params['enableUserName']) {
             $attribs['username'] = $this->string()->notNull()->unique();
         }
-        if ($this->_params['enableAdminVerification']) {
-            $attribs['enable_notification'] = $this->boolean(FALSE)->notNull();
-        }
+
         if ($this->_params['enableStatusCodes']) {
 
             $attribs['status'] = $this->smallInteger()->notNull()->defaultValue($this->_params['defaultStatusCode']);
