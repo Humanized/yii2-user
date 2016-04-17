@@ -50,7 +50,7 @@ class PasswordResetRequest extends Model
             }
 
             if ($user->save()) {
-                return \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/passwordResetToken-html', 'text' => '@vendor/humanized/yii2-user/mail/passwordResetToken-text'], ['user' => $user, 'alt' => $alt])
+                return \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/passwordResetToken-html', 'text' => '@vendor/humanized/yii2-user/mail/passwordResetToken-text'], ['user' => $user])
                                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
                                 ->setTo($this->email)
                                 ->setSubject('Set Account password for ' . \Yii::$app->name)
