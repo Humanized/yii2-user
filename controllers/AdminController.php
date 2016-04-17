@@ -4,7 +4,7 @@ namespace humanized\user\controllers;
 
 use yii\web\Controller;
 use humanized\user\models\common\UserSearch;
-use humanized\user\models\notifications\PasswordResetRequest;
+use humanized\user\models\notifications\AccountActivationConfirmation;
 
 /**
  * 
@@ -83,7 +83,7 @@ class AdminController extends Controller
         if (isset($user)) {
             if ($user->status == 0) {
                 $user->status = 10;
-                $model = new PasswordResetRequest();
+                $model = new \humanized\user\models\notifications\AccountActivationConfirmation();
                 if (isset($id) ? $model->loadMail($id) : $model->load(\Yii::$app->request->post()) && $model->validate()) {
                     $model->sendEmail();
                 }
