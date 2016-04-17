@@ -12,6 +12,7 @@ class PasswordResetRequest extends Model
 {
 
     public $email;
+    public $alt = FALSE;
 
     /**
      * @inheritdoc
@@ -49,10 +50,10 @@ class PasswordResetRequest extends Model
             }
 
             if ($user->save()) {
-                return \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/passwordResetToken-html', 'text' => '@vendor/humanized/yii2-user/mail/passwordResetToken-text'], ['user' => $user])
+                return \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/passwordResetToken-html', 'text' => '@vendor/humanized/yii2-user/mail/passwordResetToken-text'], ['user' => $user, 'alt' => $alt])
                                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
                                 ->setTo($this->email)
-                                ->setSubject('Password reset for ' . \Yii::$app->name)
+                                ->setSubject('Set Account password for ' . \Yii::$app->name)
                                 ->send();
             }
         }

@@ -2,11 +2,11 @@
 /* @var $this yii\web\View */
 /* @var $account common\models\User */
 
-$confirmationLink = Yii::$app->urlManager->createAbsoluteUrl(['/user/account/reset-password', 'id' => $account->id]);
+$confirmationLink = Yii::$app->urlManager->createAbsoluteUrl(['/user/account/request-password-reset', 'id' => $account->id]);
 ?>
 Dear Member,
 
-Your account has been activated. You can confirm your account by clicking the link below:  
+Your account has been activated. You can confirm your account by performing the required actions through the link below:  
 
 
 <?= $confirmationLink ?>
