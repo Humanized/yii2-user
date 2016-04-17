@@ -530,7 +530,7 @@ class Module extends \yii\base\Module
                     return parent::beforeAction($action);
                 }
                 \Yii::$app->returnUrl = \Yii::$app->request->requestUri;
-                $this->redirect(\Yii::$app->user->loginUrl);
+                return \Yii::$app->getResponse()->redirect(\Yii::$app->user->loginUrl);
             }
             //CASE #2: Configurable Interfaces
             if (($action->id == 'tokens' || ($action->id == 'delete-token')) && !$this->params['enableTokenAuthentication']) {
