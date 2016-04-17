@@ -27,6 +27,7 @@ class AccountActivationConfirmation extends Model
         ]);
 
         if (!isset($account)) {
+            \Yii::$app->getSession()->setFlash('error', 'No Such Account');
             return false;
         }
         \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/accountActivationConfirmation-html', 'text' => '@vendor/humanized/yii2-user/mail/accountActivationConfirmation-text'], ['account' => $account])

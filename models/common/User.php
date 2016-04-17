@@ -393,6 +393,9 @@ class User extends ActiveRecord implements IdentityInterface
                 if (!($model->validate() && $model->sendEmail())) {
                     return false;
                 }
+                if ($cond2) {
+                
+                }
             }
         }
         if ($this->_module->params['enableRBAC']) {
