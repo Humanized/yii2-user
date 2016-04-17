@@ -5,7 +5,7 @@ namespace humanized\user\controllers;
 use yii\web\Controller;
 use humanized\user\models\common\User;
 use humanized\user\models\common\AuthenticationToken;
-use humanized\user\models\common\PasswordResetRequest;
+use humanized\user\models\notifications\PasswordResetRequest;
 use humanized\user\models\common\ResetPasswordForm;
 use humanized\user\models\gui\LoginForm;
 use Yii;

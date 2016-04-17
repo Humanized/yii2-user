@@ -1,6 +1,6 @@
 <?php
 
-namespace humanized\user\models\common;
+namespace humanized\user\models\notifications;
 
 use humanized\user\models\common\User;
 use yii\base\Model;

@@ -3,7 +3,9 @@
 namespace humanized\user\models\common;
 
 use Yii;
-use humanized\user\models\common\PasswordResetRequest;
+use humanized\user\models\notifications\PasswordResetRequest;
+use humanized\user\models\notifications\AccountActivationRequest;
+use humanized\user\models\notifications\AccountActivationConfirmation;
 use humanized\user\models\common\AuthenticationToken;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -38,7 +40,6 @@ class User extends ActiveRecord implements IdentityInterface
      */
     const SCENARIO_DEFAULT = 'default';
     const SCENARIO_LOGIN = 'login';
-    
     const SCENARIO_SIGNUP = 'signup';
     const SCENARIO_PWDRST = 'password-reset';
 
@@ -102,7 +103,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         switch ($this->getScenario()) {
             case self::SCENARIO_DEFAULT || (self::SCENARIO_SIGNUP && $this->_module->params['enableUserVerification']): {
-                  
+
                     //Password generation set to true by default on admin scenario
                     $this->generatePassword = TRUE;
                     break;
@@ -410,19 +411,18 @@ class User extends ActiveRecord implements IdentityInterface
 
         if ($insert) {
             if ($this->status == self::STATUS_INACTIVE && ($this->_module->params['enableAdminVerification'] == TRUE)) {
-
-                $model = new AccountRequestNotification(['email' => $this->email]);
+                $model = new AccountActivationRequest(['email' => $this->email]);
                 if (!($model->validate() && $model->sendEmail())) {
                     return false;
                 }
             }
             //Either password is generated automatically without admin account verification enabled
             $cond1 = $this->generatePassword && !$this->_module->params['enableAdminVerification'];
-            //Or the status has changed from active to inactive
+            //Or the status has changed from inactive to active
             $cond2 = isset($changedAttributes['status']) && $this->status != 0;
             //Send email for account verification by user
             if ($cond1 || $cond2) {
-                $model = new PasswordResetRequest(['email' => $this->email]);
+                $model = new AccountActivationConfirmation(['email' => $this->email]);
                 if (!($model->validate() && $model->sendEmail())) {
                     return false;
                 }

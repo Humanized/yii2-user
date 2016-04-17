@@ -1,6 +1,6 @@
 <?php
 
-namespace humanized\user\models\common;
+namespace humanized\user\models\notifications;
 
 use humanized\user\models\common\User;
 use yii\base\Model;
@@ -8,7 +8,7 @@ use yii\base\Model;
 /**
  * Password reset request form
  */
-class AccountRequestNotification extends Model
+class AccountActivationConfirmation extends Model
 {
 
     public $email;
@@ -25,15 +25,16 @@ class AccountRequestNotification extends Model
                     //  'status' => User::STATUS_ACTIVE,
                     'email' => $this->email,
         ]);
-        $admins = User::findAll(['enable_notifications' => TRUE]);
 
-        foreach ($admins as $admin) {
-            \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/accountRequestNotification-html', 'text' => '@vendor/humanized/yii2-user/mail/accountRequestNotification-text'], ['account' => $account])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
-                    ->setTo($admin->email)
-                    ->setSubject('Account request pending approval ' . \Yii::$app->name)
-                    ->send();
+        if (!isset($account)) {
+            return false;
         }
+        \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/accountActivationConfirmation-html', 'text' => '@vendor/humanized/yii2-user/mail/accountActivationConfirmation-text'], ['account' => $account])
+                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
+                ->setTo($account->email)
+                ->setSubject('Account request pending approval ' . \Yii::$app->name)
+                ->send();
+
         return true;
     }
 
