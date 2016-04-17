@@ -11,7 +11,17 @@ use yii\base\InvalidParamException;
 class ResetPasswordForm extends Model
 {
 
+    /**
+     *
+     * @var string 
+     */
     public $password;
+
+    /**
+     * 
+     * @var string 
+     */
+    public $password_confirm;
 
     /**
      * @var \common\models\User
@@ -44,8 +54,10 @@ class ResetPasswordForm extends Model
     public function rules()
     {
         return [
+            ['password', 'string', 'min' => 8],
             ['password', 'required'],
-            ['password', 'string', 'min' => 6],
+            ['password_confirm', 'required'],
+            ['password_confirm', 'compare', 'compareAttribute' => 'password', 'message' => "Passwords don't match"],
         ];
     }
 
