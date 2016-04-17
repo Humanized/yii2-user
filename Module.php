@@ -529,7 +529,7 @@ class Module extends \yii\base\Module
                 if (in_array($action->id, $this->_public)) {
                     return parent::beforeAction($action);
                 }
-                \Yii::$app->returnUrl = \Yii::$app->request->requestUri;
+                \Yii::$app->returnUrl = Url::current();
                 return \Yii::$app->getResponse()->redirect(\Yii::$app->user->loginUrl);
             }
             //CASE #2: Configurable Interfaces
