@@ -60,7 +60,7 @@ class LoginForm extends Model
             $loginResult = Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
             if($loginResult){
                 $currentUser = Yii::$app->user->identity;
-                $currentUser->updateLastLogin();
+          //      $currentUser->updateLastLogin();
             }
             return $loginResult;
         }

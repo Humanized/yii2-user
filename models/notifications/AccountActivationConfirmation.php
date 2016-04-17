@@ -27,6 +27,7 @@ class AccountActivationConfirmation extends Model
         ]);
 
         if (!isset($account)) {
+            \Yii::$app->getSession()->setFlash('error', 'No Such Account');
             return false;
         }
         

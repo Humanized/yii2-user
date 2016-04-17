@@ -199,39 +199,6 @@ class User extends ActiveRecord implements IdentityInterface
         return $scenarios;
     }
 
-    public function updateLastLogout()
-    {
-        /*
-          $previousLastLogin = $this->last_login?:date('Y-m-d H:i:s');
-          $currentLastLogin = $this->last_login = date('Y-m-d H:i:s');
-
-          $previousLastLogin = strtotime($previousLastLogin);
-          $currentLastLogin = strtotime($currentLastLogin);
-          $deltaTime = $currentLastLogin - $previousLastLogin;
-          $this->session_total+=$deltaTime;
-          $this->session_average = $this->session_total/$this->login_count;
-          $this->save(false);
-         * 
-         */
-    }
-
-    public function updateLastLogin()
-    {
-        /*
-          $previousLastLogin = $this->last_login?:date('Y-m-d H:i:s');
-          $currentLastLogin = $this->last_login = date('Y-m-d H:i:s');
-          $this->login_count++;
-
-          $previousLastLogin = strtotime($previousLastLogin);
-          $currentLastLogin = strtotime($currentLastLogin);
-          $deltaTime = $currentLastLogin - $previousLastLogin;
-          $this->session_total+=$deltaTime;
-          $this->session_average = $this->session_total/$this->login_count;
-          $this->save(false);
-         * 
-         */
-    }
-
     /**
      * @inheritdoc
      */
@@ -425,6 +392,9 @@ class User extends ActiveRecord implements IdentityInterface
                 $model = new AccountActivationConfirmation(['email' => $this->email]);
                 if (!($model->validate() && $model->sendEmail())) {
                     return false;
+                }
+                if ($cond2) {
+                
                 }
             }
         }
