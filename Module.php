@@ -1,6 +1,7 @@
 <?php
 
 namespace humanized\user;
+
 use yii\helpers\Url;
 
 /**
@@ -530,7 +531,7 @@ class Module extends \yii\base\Module
                 if (in_array($action->id, $this->_public)) {
                     return parent::beforeAction($action);
                 }
-                \Yii::$app->returnUrl = Url::current();
+                Url::remember(Url::current());
                 return \Yii::$app->getResponse()->redirect(\Yii::$app->user->loginUrl);
             }
             //CASE #2: Configurable Interfaces
