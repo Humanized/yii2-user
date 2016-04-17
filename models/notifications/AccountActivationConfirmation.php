@@ -34,7 +34,7 @@ class AccountActivationConfirmation extends Model
         \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/accountActivationConfirmation-html', 'text' => '@vendor/humanized/yii2-user/mail/accountActivationConfirmation-text'], ['account' => $account])
                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
                 ->setTo($account->email)
-                ->setSubject(\Yii::$app->name . 'Account Request Approved')
+                ->setSubject(\Yii::$app->name . ' Account Request Approved')
                 ->send();
 
         return true;
