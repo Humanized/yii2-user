@@ -128,8 +128,9 @@ class AccountDetails extends Widget
                 $out .= ' ';
             }
         }
-
-        $out .= Html::a('Reset Password', ['request-password-reset', 'id' => $this->model->id], ['class' => 'btn btn-success']);
+        if (\Yii::$app->user->id == $this->model->id) {
+            $out .= Html::a('Reset Password', ['request-password-reset', 'id' => $this->model->id], ['class' => 'btn btn-success']);
+        }
         return $out;
     }
 
