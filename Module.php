@@ -1,6 +1,7 @@
 <?php
 
 namespace humanized\user;
+use yii\helpers\Url;
 
 /**
  * User Administration Module for Yii2
