@@ -529,6 +529,7 @@ class Module extends \yii\base\Module
             //CASE #1: Public Access (Guest Access)
             if (\Yii::$app->user->isGuest) {
                 if (in_array($action->id, $this->_public)) {
+
                     return parent::beforeAction($action);
                 }
                 Url::remember(Url::current());
@@ -624,7 +625,12 @@ class Module extends \yii\base\Module
 
     private function _validateAccountParameters($action)
     {
+        if ($action == 'request-password-reset') {
+            
+            return true;
+        }
         if ($action == 'reset-password') {
+
             return true;
         }
         $id = \yii::$app->getRequest()->getQueryParam('id');

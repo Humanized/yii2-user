@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $user common\models\User */
 
-$confirmationLink = Yii::$app->urlManager->createAbsoluteUrl(['/user/account/request-password-reset', 'id' => $account->id]);
+$confirmationLink = Yii::$app->urlManager->createAbsoluteUrl(['/user/account/request-password-reset']);
 ?>
 <div class="approve-account">
 

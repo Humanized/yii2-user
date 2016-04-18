@@ -25,6 +25,12 @@ class AccountActivationRequest extends Model
                     //  'status' => User::STATUS_ACTIVE,
                     'email' => $this->email,
         ]);
+
+        \Yii::$app->mailer->compose(['html' => '@vendor/humanized/yii2-user/mail/accountCreationConfirmation-html', 'text' => '@vendor/humanized/yii2-user/mail/accountCreationConfirmation-text'], ['account' => $account])
+                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
+                ->setTo($account->email)
+                ->setSubject('Account request pending approval ' . \Yii::$app->name)
+                ->send();
         $admins = User::findAll(['enable_notifications' => TRUE]);
 
         foreach ($admins as $admin) {

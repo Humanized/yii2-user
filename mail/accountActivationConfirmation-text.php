@@ -2,7 +2,7 @@
 /* @var $this yii\web\View */
 /* @var $account common\models\User */
 
-$confirmationLink = Yii::$app->urlManager->createAbsoluteUrl(['/user/account/request-password-reset', 'id' => $account->id]);
+$confirmationLink = Yii::$app->urlManager->createAbsoluteUrl(['/user/account/request-password-reset']);
 ?>
 Dear Member,
 
